@@ -11,16 +11,34 @@ if (workbox) {
 } else {
     swlog(`Boo! Workbox didn't load 😬`);
 }
+
 workbox.core.setCacheNameDetails({
-    prefix: 'audio-cache-test',
+    prefix: 'act',
+    suffix: 'v1',
+    precache: 'install-time',
+    runtime: 'run-time',
 });
 
-workbox.precaching.precacheAndRoute([]);
-// How do we cache mp3 in a way that enables seeking within the track?
-// https://developers.google.com/web/tools/workbox/guides/advanced-recipes#cached-av
+// =====================================================================================================================
+// Seeking inside a media file with partial requests does not work if the media is cached. Extra config is needed.
+// See https://stackoverflow.com/questions/57903010/cannot-scrub-scroll-through-jplayer-audio-when-mp3-is-cached-by-workbox/57913561#57913561
+// "If you plan on precaching the media files, then you need to take an extra step to explicitly route things so that
+// they're read from the precache, since the standard precache response handler won't use the range request plugins"
+// =====================================================================================================================
+workbox.routing.registerRoute(
+    /.*\.m4a/,
+    new workbox.strategies.CacheOnly({
+        cacheName: workbox.core.cacheNames.precache,
+        plugins: [
+            new workbox.rangeRequests.Plugin(),
+        ],
+        // This is needed since precached resources may
+        // have a ?_WB_REVISION=... URL param.
+        matchOptions: {
+            ignoreSearch: true,
+        }
+    }),
+);
 
-// 1. Try adding the plugins to precaching...
-workbox.precaching.addPlugins([
-    new workbox.cacheableResponse.Plugin({statuses: [200]}),
-    new workbox.rangeRequests.Plugin(),
-]);
+// Precache...
+workbox.precaching.precacheAndRoute([]);
