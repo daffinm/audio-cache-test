@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Audio Player Test with Cached MP3</title>
+    <style>
+        audio {
+            margin: 1rem;
+        }
+    </style>
+    <script type="text/javascript">
+        function registerSw() {
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker
+                    .register('/sw.js')
+                    .then(function () {
+                        console.log('ServiceWorker registered!');
+                    })
+                    .catch(function (err) {
+                        console.log('Cannot register service worker', err);
+                    });
+            }
+        }
+    </script>
+</head>
+<body onload="registerSw();">
+
+    <h3>preload="auto"</h3>
+    <audio controls preload="auto" crossorigin="anonymous" src="Miaow-07-Bubble.m4a"></audio>
+    <h3>preload="metadata"</h3>
+    <audio controls preload="metadata" crossorigin="anonymous" src="Miaow-07-Bubble.m4a"></audio>
+    <h3>preload="none"</h3>
+    <audio controls preload="none" crossorigin="anonymous" src="Miaow-07-Bubble.m4a"></audio>
+
+</body>
+</html>

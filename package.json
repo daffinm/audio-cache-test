@@ -1,0 +1,23 @@
+{
+  "name": "com.plok.act",
+  "version": "0.1.0",
+  "displayName": "Audio Cache Test",
+  "main": "index.html",
+  "scripts": {
+    "start": "http-server ./www -c-1"
+  },
+  "keywords": [
+    "pwa",
+    "progressive",
+    "web",
+    "app",
+    "test"
+  ],
+  "author": "Miles Daffin",
+  "license": "UNLICENSED",
+  "private": true,
+  "devDependencies": {
+    "http-server": "^0.10.0"
+  },
+  "dependencies": {}
+}

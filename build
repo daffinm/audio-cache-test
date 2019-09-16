@@ -1,0 +1,5 @@
+#!/bin/bash
+echo Running build for U p L i f t...
+# See https://developers.google.com/web/tools/workbox/guides/precache-files/cli
+#workbox wizard --injectManifest
+workbox injectManifest src/workbox-config.js

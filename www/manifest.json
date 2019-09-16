@@ -1,0 +1,12 @@
+{
+  "name": "Audio Cache Test",
+  "short_name": "Audio Cache Test",
+  "start_url": "/index.html",
+  "scope": ".",
+  "display": "standalone",
+  "background_color": "#0C6A8B",
+  "theme_color": "#0C6A8B",
+  "description": "Audio Cache Test App with Workbox 4",
+  "dir": "ltr",
+  "lang": "en-UK"
+}
