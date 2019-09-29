@@ -1,8 +1,12 @@
 # Audio Cache Test
-Test project to find out how to get audio scrub/seek working when using audio files that have been cached by the Service
-Workerd.
+Test project to find out how to get audio caching working with [Workbox](https://developers.google.com/web/tools/workbox), 
+including scrub/seek.
 
-Project uses Workbox 4. 
+Once loaded the app should work when fully offline (i.e. network cable unplugged). That is, the cached audio files should 
+still be playable whilst the un-cached audio file should not be playable. However, all audio files are currently unplayable
+when the app is offline, even when the cached audio files are clearly present in the Workbox caches.
+
+Project currently uses Workbox 4. 
 
 See
 * https://developers.google.com/web/tools/workbox/guides/advanced-recipes#cached-av 

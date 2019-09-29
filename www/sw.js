@@ -64,7 +64,8 @@ const audioCacheName = workbox.core.cacheNames.prefix + '-audio-' +workbox.core.
 // If there is a cache match, then it will properly serve partial responses.
 workbox.routing.registerRoute(
     /.*manually-cached\.(m4a|mp3)/,
-    new workbox.strategies.CacheFirst({
+    // new workbox.strategies.CacheFirst({
+    new workbox.strategies.CacheOnly({
         cacheName: audioCacheName,
         plugins: [
             new workbox.cacheableResponse.Plugin({statuses: [200]}),
