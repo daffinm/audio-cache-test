@@ -8,7 +8,6 @@
         body {
             background-color: black;
             color: white;
-            margin: 1rem;
         }
         .audio-container {
             border: solid 1px greenyellow;
@@ -18,6 +17,11 @@
 
             width: fit-content;
             width: -moz-fit-content;
+        }
+        @media only screen and (min-width : 700px) {
+            .audio-container {
+                display: inline-block;
+            }
         }
         a:link {
             color: greenyellow;
