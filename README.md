@@ -1,5 +1,6 @@
 # Audio Cache Test
-Test project to find out how to get audio scrub/seek working when using cached audio files.
+Test project to find out how to get audio scrub/seek working when using audio files that have been cached by the Service
+Worker.
 
 Project uses Workbox 4. 
 

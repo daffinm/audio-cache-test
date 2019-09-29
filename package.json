@@ -19,5 +19,7 @@
   "devDependencies": {
     "http-server": "^0.10.0"
   },
-  "dependencies": {}
+  "dependencies": {
+    "chromium": "^2.1.1"
+  }
 }
