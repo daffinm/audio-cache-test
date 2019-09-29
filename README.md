@@ -1,6 +1,6 @@
 # Audio Cache Test
 Test project to find out how to get audio scrub/seek working when using audio files that have been cached by the Service
-Worker.
+Workerd.
 
 Project uses Workbox 4. 
 
@@ -10,3 +10,8 @@ See
 
 ## Updating the service worker
 Edit ```./src/sw.js``` and then run ```./build``` to regenerate ```./www/sw.js```.
+
+## Firebase Hosting
+You can find a running copy of this project at:
+
+https://daffinm-test.firebaseapp.com/
