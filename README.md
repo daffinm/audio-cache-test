@@ -16,7 +16,7 @@ See
 * https://stackoverflow.com/questions/57903010/cannot-scrub-scroll-through-jplayer-audio-when-mp3-is-cached-by-workbox/57913561#57913561
 
 ## Updating the service worker
-Edit ```./src/sw.js``` and then run ```./build``` to regenerate ```./www/sw.js```.
+Edit ```./www/sw.js``` and then run ```./build``` to regenerate ```./www-deploy/sw.js```.
 
 ## Running on localhost:8080
 ```$xslt
