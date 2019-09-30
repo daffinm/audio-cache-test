@@ -6,7 +6,7 @@ Once loaded the app should work when fully offline (i.e. network cable unplugged
 still be playable whilst the un-cached audio file should not be playable. 
 
 These expectations are met when the app is served
-from a test server running on localhost. But when we deploy the app to firebase all audio files are currently unplayable
+from a test server running on localhost. But when we deploy the app to [Firebase](https://daffinm-test.firebaseapp.com) all audio files are currently unplayable
 when the app is offline, even when the cached audio files are clearly present in the Workbox caches.
 
 Project currently uses Workbox 4. 
