@@ -3,23 +3,49 @@
 // =====================================================================================================================
 
 function swlog(message, object) {
-    console.log(`[Service Worker] ${message}`, object ? object : null);
+    console.log(`[Service Worker] ${message}`, object ? object : '');
 }
-importScripts('https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js');
+// Switch Workbox Versions here.
+const WorkboxVersions = Object.freeze({
+    V4: "4.3.1",
+    V5: "5.0.0-beta.0"
+});
+const WORKBOX_DEBUG = true;
+const WORKBOX_VERSION = WorkboxVersions.V4;
+// const WORKBOX_VERSION = WorkboxVersions.V5;
+importScripts(`https://storage.googleapis.com/workbox-cdn/releases/${WORKBOX_VERSION}/workbox-sw.js`);
 if (workbox) {
-    swlog(`Yay! Workbox is loaded 😁`);
+    swlog(`Yay! Workbox ${WORKBOX_VERSION} is loaded 😁`);
 } else {
-    swlog(`Boo! Workbox didn't load 😬`);
+    swlog(`Boo! Workbox ${WORKBOX_VERSION} didn't load 😬`);
 }
-workbox.setConfig({debug: true});
-
+workbox.setConfig({debug: WORKBOX_DEBUG});
 workbox.core.setCacheNameDetails({
     prefix: 'act',
-    suffix: 'v1',
+    suffix: WORKBOX_VERSION,
     precache: 'install-time',
     runtime: 'run-time',
 });
-
+// The plugins we are going to need
+let precachePlugins = [];
+let manualCachePlugins = [];
+if (WORKBOX_VERSION === WorkboxVersions.V4) {
+    precachePlugins = [
+        new workbox.rangeRequests.Plugin()
+    ];
+    manualCachePlugins = [
+        new workbox.cacheableResponse.Plugin({statuses: [200]}),
+        new workbox.rangeRequests.Plugin(),
+    ];
+} else {
+    precachePlugins = [
+        new workbox.rangeRequests.RangeRequestsPlugin()
+    ];
+    manualCachePlugins = [
+        new workbox.cacheableResponse.CacheableResponsePlugin({statuses: [200]}),
+        new workbox.rangeRequests.RangeRequestsPlugin(),
+    ];
+}
 // =====================================================================================================================
 // 1. Precached Audio File
 // =====================================================================================================================
@@ -29,9 +55,7 @@ workbox.routing.registerRoute(
     /.*pre-cached\.(m4a|mp3)/,
     new workbox.strategies.CacheOnly({
         cacheName: workbox.core.cacheNames.precache,
-        plugins: [
-            new workbox.rangeRequests.Plugin(),
-        ],
+        plugins: precachePlugins,
         // This is needed since precached resources may
         // have a ?_WB_REVISION=... URL param.
         matchOptions: {
@@ -64,13 +88,11 @@ const audioCacheName = workbox.core.cacheNames.prefix + '-audio-' +workbox.core.
 // If there is a cache match, then it will properly serve partial responses.
 workbox.routing.registerRoute(
     /.*manually-cached\.(m4a|mp3)/,
+    // NOTE: using CacheFirst here tricked me into thinking that audio caching was working. But it was failing and going to the network instead...
     // new workbox.strategies.CacheFirst({
     new workbox.strategies.CacheOnly({
         cacheName: audioCacheName,
-        plugins: [
-            new workbox.cacheableResponse.Plugin({statuses: [200]}),
-            new workbox.rangeRequests.Plugin(),
-        ],
+        plugins: manualCachePlugins,
     }),
 );
 // It's up to you to either precache or explicitly call cache.add('movie.mp4')
