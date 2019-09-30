@@ -67,3 +67,15 @@ https://daffinm-test.firebaseapp.com/
     makeRequest @ CacheOnly.mjs:115
 
     ```
+## Switch Workbox versions
+You can switch Workbox versions easily for testing purposes by updating ```workbox-src/sw.js```
+
+```$xslt
+const WorkboxVersions = Object.freeze({
+    V4: "4.3.1",
+    V5: "5.0.0-beta.0"
+});
+const WORKBOX_DEBUG = true;
+const WORKBOX_VERSION = WorkboxVersions.V4;
+```
+Currently, Workbox 5 doesn't work at all. Cached audio will not play, even locally. 
