@@ -7,7 +7,7 @@ module.exports = {
   "globPatterns": [
     "{index.html,audio/m4a/pre-cached.m4a,audio/mp3/pre-cached.mp3}"
   ],
-  "swSrc" : "workbox-src/sw.js",
-  "swDest": "www/sw.js",
+  "swSrc" : "www/sw.js",
+  "swDest": "www-deploy/sw.js",
   "maximumFileSizeToCacheInBytes": 4 * 1024 * 1024
 };

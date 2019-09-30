@@ -5,7 +5,7 @@
 /tmp
 /test*
 /.firebase
-/firebase-deploy
+/www-deploy
 package-lock.json
 
 # ====================================================

@@ -1,13 +1,19 @@
 #!/bin/bash
-printf "\n:: Running build for Audio Cache Test..."
+WORKBOX_CONFIG=workbox-config.js
+SOURCE_DIR="www/"
+DEPLOY_DIR="www-deploy/"
+
+printf "\n::::: Syncing ${SOURCE_DIR} to ${DEPLOY_DIR}:\n\n"
+rsync -v -a $SOURCE_DIR $DEPLOY_DIR
+
 # See https://developers.google.com/web/tools/workbox/guides/precache-files/cli
 #workbox wizard --injectManifest
-printf "\n\n:: 1. Injecting Workbox pre-cache:\n\n"
-workbox injectManifest workbox-src/workbox-config.js
+printf "\n::::: Injecting Workbox pre-cache:\n\n"
+# Overwrites sw.js file in deploy directory.
+workbox injectManifest $WORKBOX_CONFIG
+
 if [ "$1" == "deploy" ]; then
-  printf "\n\n:: 2. Syncing www to firebase-deploy directory:\n\n"
-  rsync -v -a www/ firebase-deploy/
-  printf "\n\n:: 3. Deploying app to firebase:\n"
+  printf "\n::::: Deploying app to firebase:\n"
   if [ "$2" == "debug" ]; then
     firebase --debug --only hosting deploy
   else

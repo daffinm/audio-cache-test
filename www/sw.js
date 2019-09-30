@@ -64,20 +64,7 @@ workbox.routing.registerRoute(
     }),
 );
 // Precache...
-workbox.precaching.precacheAndRoute([
-  {
-    "url": "audio/m4a/pre-cached.m4a",
-    "revision": "f3c43d39b05441fa464bb228282f0609"
-  },
-  {
-    "url": "audio/mp3/pre-cached.mp3",
-    "revision": "35ee07d2789d2da7fe76801fcfe2092c"
-  },
-  {
-    "url": "index.html",
-    "revision": "2adbd59c952a95c84d9d2649d2f101ae"
-  }
-]);
+workbox.precaching.precacheAndRoute([]);
 
 // ====================================================================================================================
 // 2. Manually Cached Audio File
