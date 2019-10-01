@@ -5,14 +5,17 @@
 function swlog(message, object) {
     console.log(`[Service Worker] ${message}`, object ? object : '');
 }
-// Switch Workbox Versions here.
+// Update with latest Workbox 4 and 5 versions. See https://github.com/GoogleChrome/workbox/releases
 const WorkboxVersions = Object.freeze({
     V4: "4.3.1",
     V5: "5.0.0-beta.0"
 });
 const WORKBOX_DEBUG = true;
+// Switch Workbox Versions here.
 const WORKBOX_VERSION = WorkboxVersions.V4;
-// const WORKBOX_VERSION = WorkboxVersions.V5;
+const APP_CACHE_PREFIX = 'act';
+const APP_CACHE_VERSION = 'actv0.0.1';
+const APP_CACHE_SUFFIX = `wbv${WORKBOX_VERSION}-${APP_CACHE_VERSION}`;
 importScripts(`https://storage.googleapis.com/workbox-cdn/releases/${WORKBOX_VERSION}/workbox-sw.js`);
 if (workbox) {
     swlog(`Yay! Workbox ${WORKBOX_VERSION} is loaded 😁`);
@@ -21,11 +24,23 @@ if (workbox) {
 }
 workbox.setConfig({debug: WORKBOX_DEBUG});
 workbox.core.setCacheNameDetails({
-    prefix: 'act',
-    suffix: `wbv${WORKBOX_VERSION}`,
-    precache: 'install-time',
-    runtime: 'run-time',
+    prefix: APP_CACHE_PREFIX,
+    suffix: APP_CACHE_SUFFIX,
+    precache: 'pre-cache',
+    runtime: 'runtime-cache',
 });
+// Clean up old cache - ones that we know are ours and that we will never use again.
+// TODO check namespace logic. Do I really need to check the prefix or will I only ever be dealing with caches for my app because of namespace segregation?
+self.addEventListener('activate', function(event) {
+    event.waitUntil(
+        caches
+            .keys()
+            .then(keys => keys.filter(key => key.startsWith(APP_CACHE_PREFIX) && !key.endsWith(APP_CACHE_SUFFIX)))
+            .then(keys => Promise.all(keys.map(key => caches.delete(key))))
+    );
+});
+
+
 // The plugins we are going to need
 let precachePlugins = [];
 let manualCachePlugins = [];
@@ -69,7 +84,7 @@ workbox.precaching.precacheAndRoute([]);
 // ====================================================================================================================
 // 2. Manually Cached Audio File
 // =====================================================================================================================
-const audioCacheName = workbox.core.cacheNames.prefix + '-audio-' +workbox.core.cacheNames.suffix;
+const MANUAL_CACHE_NAME = workbox.core.cacheNames.prefix + '-manual-cache-' +workbox.core.cacheNames.suffix;
 // This route will go against the network if there isn't a cache match,
 // but it won't populate the cache at runtime.
 // If there is a cache match, then it will properly serve partial responses.
@@ -78,18 +93,25 @@ workbox.routing.registerRoute(
     // NOTE: using CacheFirst here tricked me into thinking that audio caching was working. But it was failing and going to the network instead...
     // new workbox.strategies.CacheFirst({
     new workbox.strategies.CacheOnly({
-        cacheName: audioCacheName,
+        cacheName: MANUAL_CACHE_NAME,
         plugins: manualCachePlugins,
     }),
 );
 // It's up to you to either precache or explicitly call cache.add('movie.mp4')
 // to populate the cache.
-caches.open(audioCacheName)
+caches.open(MANUAL_CACHE_NAME)
     .then(function(cache) {
-        cache.add('/audio/m4a/manually-cached.m4a');
-        cache.add('/audio/mp3/manually-cached.mp3');
+        cache.add('/audio/manually-cached.m4a');
+        cache.add('/audio/manually-cached.mp3');
     })
     .catch(function (error) {
         swlog('Error populating audio cache manually:', error);
     });
 
+// ====================================================================================================================
+// 3. Crossorigin resources
+// =====================================================================================================================
+workbox.routing.registerRoute(
+    'https://code.jquery.com/jquery-3.4.1.min.js',
+    new workbox.strategies.StaleWhileRevalidate(),
+);

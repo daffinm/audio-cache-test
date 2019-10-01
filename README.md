@@ -2,73 +2,96 @@
 Test project to find out how to get audio caching working with [Workbox](https://developers.google.com/web/tools/workbox), 
 including scrub/seek.
 
-Once loaded the app should work when fully offline (i.e. network cable unplugged). That is, the cached audio files should 
-still be playable whilst the un-cached audio file should not be playable. 
-
-These expectations are met when the app is served
-from a test server running on localhost. But when we deploy the app to [Firebase](https://daffinm-test.firebaseapp.com) all audio files are currently unplayable
-when the app is offline, even when the cached audio files are clearly present in the Workbox caches.
-
-Project currently uses Workbox 4. 
+## Background reading
 
 See
 * https://developers.google.com/web/tools/workbox/guides/advanced-recipes#cached-av 
 * https://stackoverflow.com/questions/57903010/cannot-scrub-scroll-through-jplayer-audio-when-mp3-is-cached-by-workbox/57913561#57913561
 
-## Updating the service worker
-Edit ```./www/sw.js``` and then run ```./build``` to regenerate ```./www-deploy/sw.js```.
+## App setup
+The app contains 4 audio elements. Once loaded from the network all audio should be cached *except* the file labelled 
+'Not cached'. All audio labelled 'cached' should therefore be playable when offline (i.e. network cable unplugged). 
+The un-cached audio file should only be playable when online. 
 
-## Running on localhost:8080
-```$xslt
-npm start
+The 4 audio elements all have identical attributes except for ```src```:
+```html
+<audio controls 
+    preload="metadata" 
+    crossorigin="anonymous" 
+    src="audio/[audio-file-name].mp3">
+</audio>
 ```
-Then go to http://localhost:8080
+##### Audio 1: Pre-cached (no router)
+This is pre-cached using ```workbox injectManifest``` but it is not configured with a Workbox 
+[range requests router](https://developers.google.com/web/tools/workbox/modules/workbox-range-requests).
 
-## Firebase Hosting
-You can find a running copy of this project at:
+The expectations for this audio therefore are:
+* Should be playable online or offline.
+* Should not be able to seek/scrub.
 
-https://daffinm-test.firebaseapp.com/
+##### Audio 2: Pre-cached
+This is also pre-cached using ```workbox injectManifest``` and configured with a Workbox range requests router.
 
-## Tests
-#### Localhost
-1. Run server and goto http://localhost:8080
-1. Play all 6 audio files.
-   * Expected: all files play and you can seek/scrub in all cases.
-   * Actual: as expected.
-1. Shutdown local server and refresh page.
-   * Expected: page is loaded from cache.
-   * Actual: as expected.
-1. Play all 6 audio files.
-   * Expected: Cached files play. Uncached file does not play. (In Chrome, unplayable/loadable audio files have audio 
-   controls disabled.)
-   * Actual: as expected.
-#### Firebase
-1. Goto https://daffinm-test.firebaseapp.com
-1. Play all 6 audio files.
-   * Expected: all files play and you can seek/scrub in all cases.
-   * Actual: as expected first time I access the page. But when I refresh cached files are no longer playable or are 
-   only parly playable (like they are partly buffered somewhere).  Uncached file is still playable which shows that Firebase
-   is not the problem (I think...).
-1. Disconnect from the internet and refresh page: 
-   * Expected: page is loaded from cache.
-   * Actual: as expected.
-1. Play all 6 audio files.
-   * Expected: cached files play. Uncached file does not play.
-   * Actual: all files are unplayable. In the console log we see the same error for all cached files (mp3 or m4a):
-    ```$xslt
-    logger.mjs:44 workbox Router is responding to: /audio/m4a/pre-cached.m4a
-    logger.mjs:44 workbox Using CacheOnly to respond to '/audio/m4a/pre-cached.m4a'
-    The FetchEvent for "https://daffinm-test.firebaseapp.com/audio/m4a/pre-cached.m4a" resulted in a network error response: the promise was rejected.
-    Promise.then (async)
-    (anonymous) @ Router.mjs:60
-    CacheOnly.mjs:115 Uncaught (in promise) no-response: The strategy could not generate a response for 'https://daffinm-test.firebaseapp.com/audio/m4a/pre-cached.m4a'.
-        at CacheOnly.makeRequest (https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-strategies.dev.js:343:15)
-    WorkboxError @ WorkboxError.mjs:33
-    makeRequest @ CacheOnly.mjs:115
+The expectations for this audio therefore are:
+* Should be playable online or offline.
+* Should be able to seek/scrub.
 
-    ```
-## Switch Workbox versions
-You can switch Workbox versions easily for testing purposes by updating ```workbox-src/sw.js```
+##### Audio 3: Manually cached
+This audio file is 'manually' cached using ```cache.add()``` with a router that uses the Workbox range requests plugin.
+
+The expectations for this audio therefore are:
+* Should be playable online or offline.
+* Should be able to seek/scrub.
+
+##### Audio 4: Not cached
+This audio file is deliberately not cached using Workbox. 
+
+The expectations for this audio therefore are:
+* Should be playable online but not offline.
+* Should be able to seek/scrub since file is being fetched directly from a server that will support range requests.
+
+### Expected vs actual results
+
+I am mostly using Chrome for testing and debugging:
+```
+Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36
+```
+These expectations are met when the app is served from a test server running on localhost. But when we [deploy the app 
+to Firebase](https://daffinm-test.firebaseapp.com) strange things start happening... 
+
+* Initially, when the app is first loaded from Firebase: 
+  * All audio files appear enabled and are playable.
+  * The pre-cached (no router) audio is scrubbable! (When served from a local, dev server, scrubbing is impossible, 
+  which is what you would expect.)
+  * Cached audio is all scrubbable. 
+  * The un-cached audio is also scrubbable.
+* If you then disconnect from the internet __without__ reloading the app:
+  * The 1st audio file (pre-cached - no router) is playable for the first 6 seconds and you cannot scrub.
+  * The 2nd audio file (pre-cached) is playable for about 20 seconds (no scrubbing).
+  * The 3rd audio file (manually cached) is playable for about 36 seconds (no scrubbing).
+  * The 4th audio file (not cached) is unplayable (as you would expect).
+* If you then refresh the page:
+  * Audio 1: playable and scrubbable. (Browser must be buffering it from the pre-cache.)
+  * Audio 2: disabled! (unexpected)
+  * Audio 3: disabled! (unexpected)
+  * Audio 4: disabled.
+
+## Editing, testing and debugging the app locally
+1. Edit the files in the  ```www/``` directory.
+1. Open a console in the project root, install the npm packages and run the local dev server:
+   ```
+   $ npm install
+   $ npm start 
+   ```
+1. Run the build (syncs ```www/``` to ```www-deploy/```): 
+   ```
+   $ ./build
+   ```
+1. Goto http://localhost:8080
+
+## Switch Workbox versions?
+You can switch Workbox versions easily for testing purposes by updating 
+```workbox-src/sw.js```
 
 ```$xslt
 const WorkboxVersions = Object.freeze({
@@ -78,4 +101,9 @@ const WorkboxVersions = Object.freeze({
 const WORKBOX_DEBUG = true;
 const WORKBOX_VERSION = WorkboxVersions.V4;
 ```
-Currently, Workbox 5 doesn't work at all. Cached audio will not play, even locally. 
+Currently, Workbox 4 seems more reliable. Cached audio files with range request routers 
+are playable when the app is served from a local dev server (online of offline) and only become
+problematic when you deploy to Firebase. 
+
+On the other hand, with Workbox 5, cached audio
+with range request routers are unplayable when served from localhost or Firebase (online or offline). 

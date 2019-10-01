@@ -5,7 +5,7 @@
 module.exports = {
   "globDirectory": "www/",
   "globPatterns": [
-    "{index.html,audio/m4a/pre-cached.m4a,audio/mp3/pre-cached.mp3}"
+    "{index.html,audio/pre-cached.m4a,audio/pre-cached.mp3,audio/pre-cached-no-router.mp3}"
   ],
   "swSrc" : "www/sw.js",
   "swDest": "www-deploy/sw.js",

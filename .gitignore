@@ -4,6 +4,7 @@
 /node_modules/
 /tmp
 /test*
+/logs
 /.firebase
 /www-deploy
 package-lock.json
