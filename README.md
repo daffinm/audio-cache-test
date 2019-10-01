@@ -2,6 +2,21 @@
 Test project to find out how to get audio caching working with [Workbox](https://developers.google.com/web/tools/workbox), 
 including scrub/seek.
 
+This app is currently deployed on Firebase:
+
+https://daffinm-test.firebaseapp.com/
+
+## Latest news
+* The problems described below all seem to happen when serving the app from Firebase and running in Chrome:
+  ```
+  Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36
+  ```
+* Everything seems to work fine (as expected) in Firefox:
+  ```
+   Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:69.0) Gecko/20100101 Firefox/69.0
+  ```
+Now testing on Windows 10/Chrome.
+
 ## Background reading
 
 See
