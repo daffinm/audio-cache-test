@@ -108,10 +108,3 @@ caches.open(MANUAL_CACHE_NAME)
         swlog('Error populating audio cache manually:', error);
     });
 
-// ====================================================================================================================
-// 3. Crossorigin resources
-// =====================================================================================================================
-workbox.routing.registerRoute(
-    'https://code.jquery.com/jquery-3.4.1.min.js',
-    new workbox.strategies.StaleWhileRevalidate(),
-);
