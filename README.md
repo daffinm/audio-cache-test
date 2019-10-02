@@ -22,6 +22,8 @@ Now testing on Windows 10/Chrome.
 ```
 Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36
 ```
+* App has been updated to add video and to enable experimentation with different audio formats and preload settings to 
+see if any of this makes a difference.
 
 ## Background reading
 
@@ -34,14 +36,6 @@ The app contains 4 audio elements. Once loaded from the network all audio should
 'Not cached'. All audio labelled 'cached' should therefore be playable when offline (i.e. network cable unplugged). 
 The un-cached audio file should only be playable when online. 
 
-The 4 audio elements all have identical attributes except for ```src```:
-```html
-<audio controls 
-    preload="metadata" 
-    crossorigin="anonymous" 
-    src="audio/[audio-file-name].mp3">
-</audio>
-```
 ##### Audio 1: Pre-cached (no router)
 This is pre-cached using ```workbox injectManifest``` but it is not configured with a Workbox 
 [range requests router](https://developers.google.com/web/tools/workbox/modules/workbox-range-requests).
