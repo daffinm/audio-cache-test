@@ -1,10 +1,12 @@
-# Audio Cache Test
-Test project to find out how to get audio caching working with [Workbox](https://developers.google.com/web/tools/workbox), 
-including scrub/seek.
+# Media Cache Test
+Test project to find out how to get media caching (audio and video) working with [Workbox](https://developers.google.com/web/tools/workbox), 
+including scrub/seek using the [range requests plugin](https://developers.google.com/web/tools/workbox/modules/workbox-range-requests).
 
 This app is currently deployed on Firebase:
 
 https://daffinm-test.firebaseapp.com/
+
+Basic findings: cached audio with a range requests router will not play in Chrome.
 
 ## Latest news
 * The problems described below all seem to happen when serving the app from Firebase and running in Chrome:
