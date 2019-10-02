@@ -26,7 +26,7 @@ workbox.setConfig({debug: WORKBOX_DEBUG});
 workbox.core.setCacheNameDetails({
     prefix: APP_CACHE_PREFIX,
     suffix: APP_CACHE_SUFFIX,
-    precache: 'pre-cache',
+    precache: 'auto-pre-cache',
     runtime: 'runtime-cache',
 });
 // Clean up old cache - ones that we know are ours and that we will never use again.
@@ -39,7 +39,6 @@ self.addEventListener('activate', function(event) {
             .then(keys => Promise.all(keys.map(key => caches.delete(key))))
     );
 });
-
 
 // The plugins we are going to need
 let precachePlugins = [];
@@ -67,7 +66,7 @@ if (WORKBOX_VERSION === WorkboxVersions.V4) {
 // "If you plan on precaching the media files, then you need to take an extra step to explicitly route things so that
 // they're read from the precache, since the standard precache response handler won't use the range request plugins"
 workbox.routing.registerRoute(
-    /.*pre-cached\.(m4a|mp3)/,
+    /.*auto-pre-cached\.(m4a|mp3|mp4)/,
     new workbox.strategies.CacheOnly({
         cacheName: workbox.core.cacheNames.precache,
         plugins: precachePlugins,
@@ -84,12 +83,12 @@ workbox.precaching.precacheAndRoute([]);
 // ====================================================================================================================
 // 2. Manually Cached Audio File
 // =====================================================================================================================
-const MANUAL_CACHE_NAME = workbox.core.cacheNames.prefix + '-manual-cache-' +workbox.core.cacheNames.suffix;
+const MANUAL_CACHE_NAME = workbox.core.cacheNames.prefix + '-manual-pre-cache-' +workbox.core.cacheNames.suffix;
 // This route will go against the network if there isn't a cache match,
 // but it won't populate the cache at runtime.
 // If there is a cache match, then it will properly serve partial responses.
 workbox.routing.registerRoute(
-    /.*manually-cached\.(m4a|mp3)/,
+    /.*manually-pre-cached\.(m4a|mp3|mp4)/,
     // NOTE: using CacheFirst here tricked me into thinking that audio caching was working. But it was failing and going to the network instead...
     // new workbox.strategies.CacheFirst({
     new workbox.strategies.CacheOnly({
@@ -101,8 +100,9 @@ workbox.routing.registerRoute(
 // to populate the cache.
 caches.open(MANUAL_CACHE_NAME)
     .then(function(cache) {
-        cache.add('/audio/manually-cached.m4a');
-        cache.add('/audio/manually-cached.mp3');
+        cache.add('/media/audio/manually-pre-cached.m4a');
+        cache.add('/media/audio/manually-pre-cached.mp3');
+        cache.add('/media/video/manually-pre-cached.mp4');
     })
     .catch(function (error) {
         swlog('Error populating audio cache manually:', error);
