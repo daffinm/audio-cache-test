@@ -16,6 +16,10 @@ https://daffinm-test.firebaseapp.com/
    Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:69.0) Gecko/20100101 Firefox/69.0
   ```
 Now testing on Windows 10/Chrome.
+* Same issues on Windows as on Linux (Ubuntu 18.04):
+```
+Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36
+```
 
 ## Background reading
 
