@@ -1,6 +1,6 @@
 # Media Cache Test
 Test project to find out how to get media caching (audio and video) working with [Workbox](https://developers.google.com/web/tools/workbox), 
-including scrub/seek using the [range requests plugin](https://developers.google.com/web/tools/workbox/modules/workbox-range-requests).
+including scrub/seek using the [range requests plugin](https://developers.google.com/web/tools/workbox/modules/workbox-range-requests). It was orginally just confined to audio but I extended it to see if the problems with the range request router were apparent with video too. They seem to be (in Chrome at least).
 
 This app is currently deployed on Firebase:
 
