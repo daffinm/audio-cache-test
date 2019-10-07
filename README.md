@@ -114,15 +114,15 @@ does not have a range requests router (odd: why is this different from when runn
 
 * If I then reload/refresh the page whilst still online I start seeing errors in the workbox log for all files that 
 have range request routers:
-```
-Router is responding to: /media/audio/auto-pre-cached.mp3
-Using CacheOnly to respond to '/media/audio/auto-pre-cached.mp3'
-    No response found in the 'act-auto-pre-cache-wbv4.3.1-actv0.0.1' cache.
-    The FetchEvent for "https://daffinm-test.firebaseapp.com/media/audio/auto-pre-cached.mp3" resulted in a network error response: the promise was rejected.
-    CacheOnly.mjs:115 Uncaught (in promise) no-response: The strategy could not generate a response for 'https://daffinm-test.firebaseapp.com/media/audio/auto-pre-cached.mp3'.
-        at CacheOnly.makeRequest (https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-strategies.dev.js:343:15)
-```
-  ![After initial load](img/chrome-02.png "After initial load")
+    ```
+    Router is responding to: /media/audio/auto-pre-cached.mp3
+    Using CacheOnly to respond to '/media/audio/auto-pre-cached.mp3'
+        No response found in the 'act-auto-pre-cache-wbv4.3.1-actv0.0.1' cache.
+        The FetchEvent for "https://daffinm-test.firebaseapp.com/media/audio/auto-pre-cached.mp3" resulted in a network error response: the promise was rejected.
+        CacheOnly.mjs:115 Uncaught (in promise) no-response: The strategy could not generate a response for 'https://daffinm-test.firebaseapp.com/media/audio/auto-pre-cached.mp3'.
+            at CacheOnly.makeRequest (https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-strategies.dev.js:343:15)
+    ```
+  ![After re-load](img/chrome-02.png "After re-load")
 
 * If I then unregister the service worker and refresh the page a new service worker instance is activated and 
 I am able to play all the pre-cached audio files fine.
