@@ -24,6 +24,8 @@ Detailed test setup, expectations and results are below.
 
 ## Latest news
 
+* Problem solved by Jeff Posnick. See https://stackoverflow.com/a/58276728/3566167. Code in this demo has been updated
+accordingly both in the repo and in Firebase.
 * App has been updated to add video and to enable experimentation with different audio formats and preload settings to 
 see if any of this makes a difference. It does not seem to.
 

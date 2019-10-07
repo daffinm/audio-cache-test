@@ -74,6 +74,7 @@ workbox.routing.registerRoute(
         // have a ?_WB_REVISION=... URL param.
         matchOptions: {
             ignoreSearch: true,
+            ignoreVary: true
         }
     }),
 );
@@ -94,6 +95,9 @@ workbox.routing.registerRoute(
     new workbox.strategies.CacheOnly({
         cacheName: MANUAL_CACHE_NAME,
         plugins: manualCachePlugins,
+        matchOptions: {
+            ignoreVary: true,
+        }
     }),
 );
 // It's up to you to either precache or explicitly call cache.add('movie.mp4')
