@@ -10,6 +10,7 @@
         body {
             background-color: black;
             color: white;
+            margin: 1rem 1rem 2rem 1rem;
         }
         .media-settings, .media-container {
             border: solid 1px greenyellow;
@@ -19,17 +20,27 @@
         .media-settings {
             padding: 0 1rem 0 1rem;
         }
-        .media-container {
-            padding: 0 1rem 1rem 1rem;
+        .media-settings h3 {
+            display: inline-block;
+        }
+        .media {
+            display: flex;
+            justify-content: left;
+            flex-flow: row wrap;
         }
         .media-container {
+            padding: 0 1rem 1rem 1rem;
+            height: fit-content;
+            height: -moz-fit-content;
             width: fit-content;
             width: -moz-fit-content;
+            margin-right: 1rem;
         }
         .highlight {
             border: solid 1px greenyellow;
             border-radius: 10px;
         }
+/*
         @media only screen and (min-width : 700px) {
             .media-container {
                 display: inline-block;
@@ -37,6 +48,7 @@
                 margin-right: 0.5rem;
             }
         }
+*/
         a:link {
             color: greenyellow;
         }
@@ -61,7 +73,7 @@
 </head>
 <body>
     <div class="media-settings">
-        <h3 style="display: inline-block;">Media Settings:</h3>
+        <h3>Media Settings:</h3>
         <label for="audio-format">Audio Format</label>
         <select id="audio-format">
             <option selected value=".mp3">MP3</option>
@@ -74,53 +86,62 @@
             <option value="none">none</option>
         </select>
     </div>
+    <div class="media">
 
-    <div class="media-container">
-        <h3>Audio: Preload=metadata</h3>
-        <h4>Auto pre-cached (no range requests)</h4>
-        <audio controls preload="metadata" crossorigin="anonymous" src="media/audio/auto-pre-cached-no-router.mp3"></audio>
-        <h4>Auto pre-cached</h4>
-        <audio controls preload="metadata" crossorigin="anonymous" src="media/audio/auto-pre-cached.mp3"></audio>
-        <h4>Manually pre-cached</h4>
-        <audio controls preload="metadata" crossorigin="anonymous" src="media/audio/manually-pre-cached.mp3"></audio>
-        <h4>Not cached</h4>
-        <audio controls preload="metadata" crossorigin="anonymous" src="media/audio/not-cached.mp3"></audio>
-    </div>
-    <div class="media-container">
-        <h3>Audio: Preload=auto</h3>
-        <h4>Auto pre-cached (no range requests)</h4>
-        <audio controls preload="auto" crossorigin="anonymous" src="media/audio/auto-pre-cached-no-router.mp3"></audio>
-        <h4>Auto pre-cached</h4>
-        <audio controls preload="auto" crossorigin="anonymous" src="media/audio/auto-pre-cached.mp3"></audio>
-        <h4>Manually pre-cached</h4>
-        <audio controls preload="auto" crossorigin="anonymous" src="media/audio/manually-pre-cached.mp3"></audio>
-        <h4>Not cached</h4>
-        <audio controls preload="auto" crossorigin="anonymous" src="media/audio/not-cached.mp3"></audio>
-    </div>
-    <div class="media-container">
-        <h3>Video: Preload=metadata</h3>
-        <h4>Auto pre-cached (no range requests)</h4>
-        <video controls preload="metadata" crossorigin="anonymous" src="media/video/auto-pre-cached-no-router.mp4"></video>
-        <h4>Auto pre-cached</h4>
-        <video controls preload="metadata" crossorigin="anonymous" src="media/video/auto-pre-cached.mp4"></video>
-        <h4>Manually pre-cached</h4>
-        <video controls preload="metadata" crossorigin="anonymous" src="media/video/manually-pre-cached.mp4"></video>
-        <h4>Not cached</h4>
-        <video controls preload="metadata" crossorigin="anonymous" src="media/video/not-cached.mp4"></video>
-    </div>
-    <div class="media-container">
-        <h3>Video: Preload=auto</h3>
-        <h4>Auto pre-cached (no range requests)</h4>
-        <video controls preload="auto" crossorigin="anonymous" src="media/video/auto-pre-cached-no-router.mp4"></video>
-        <h4>Auto pre-cached</h4>
-        <video controls preload="auto" crossorigin="anonymous" src="media/video/auto-pre-cached.mp4"></video>
-        <h4>Manually pre-cached</h4>
-        <video controls preload="auto" crossorigin="anonymous" src="media/video/manually-pre-cached.mp4"></video>
-        <h4>Not cached</h4>
-        <video controls preload="auto" crossorigin="anonymous" src="media/video/not-cached.mp4"></video>
+        <div class="media-container">
+            <h3>Audio: Preload=metadata</h3>
+            <h4>Auto pre-cached (no range requests)</h4>
+            <audio controls preload="metadata" crossorigin="anonymous" src="media/audio/auto-pre-cached-no-router.mp3"></audio>
+            <h4>Auto pre-cached</h4>
+            <audio controls preload="metadata" crossorigin="anonymous" src="media/audio/auto-pre-cached.mp3"></audio>
+            <h4>Manually pre-cached</h4>
+            <audio controls preload="metadata" crossorigin="anonymous" src="media/audio/manually-pre-cached.mp3"></audio>
+            <h4>Not cached</h4>
+            <audio controls preload="metadata" crossorigin="anonymous" src="media/audio/not-cached.mp3"></audio>
+        </div>
+
+        <div class="media-container">
+            <h3>Audio: Preload=auto</h3>
+            <h4>Auto pre-cached (no range requests)</h4>
+            <audio controls preload="auto" crossorigin="anonymous" src="media/audio/auto-pre-cached-no-router.mp3"></audio>
+            <h4>Auto pre-cached</h4>
+            <audio controls preload="auto" crossorigin="anonymous" src="media/audio/auto-pre-cached.mp3"></audio>
+            <h4>Manually pre-cached</h4>
+            <audio controls preload="auto" crossorigin="anonymous" src="media/audio/manually-pre-cached.mp3"></audio>
+            <h4>Not cached</h4>
+            <audio controls preload="auto" crossorigin="anonymous" src="media/audio/not-cached.mp3"></audio>
+        </div>
+
+        <div class="media-container">
+            <h3>Video: Preload=metadata</h3>
+            <h4>Auto pre-cached (no range requests)</h4>
+            <video controls preload="metadata" crossorigin="anonymous" src="media/video/auto-pre-cached-no-router.mp4"></video>
+            <h4>Auto pre-cached</h4>
+            <video controls preload="metadata" crossorigin="anonymous" src="media/video/auto-pre-cached.mp4"></video>
+            <h4>Manually pre-cached</h4>
+            <video controls preload="metadata" crossorigin="anonymous" src="media/video/manually-pre-cached.mp4"></video>
+            <h4>Not cached</h4>
+            <video controls preload="metadata" crossorigin="anonymous" src="media/video/not-cached.mp4"></video>
+        </div>
+
+        <div class="media-container">
+            <h3>Video: Preload=auto</h3>
+            <h4>Auto pre-cached (no range requests)</h4>
+            <video controls preload="auto" crossorigin="anonymous" src="media/video/auto-pre-cached-no-router.mp4"></video>
+            <h4>Auto pre-cached</h4>
+            <video controls preload="auto" crossorigin="anonymous" src="media/video/auto-pre-cached.mp4"></video>
+            <h4>Manually pre-cached</h4>
+            <video controls preload="auto" crossorigin="anonymous" src="media/video/manually-pre-cached.mp4"></video>
+            <h4>Not cached</h4>
+            <video controls preload="auto" crossorigin="anonymous" src="media/video/not-cached.mp4"></video>
+        </div>
+
     </div>
 
-    <p>Media used in demo: © 2003 Miaow / Arnaud Laflaquiere - <a href="http://www.miaowmusic.net" target="_blank">MiaowMusic.net</a></p>
+    <p>Media used in demo:
+        Audio © 2003 Miaow / Arnaud Laflaquiere - <a href="http://www.miaowmusic.net" target="_blank">MiaowMusic.net</a><br>
+        <!--Video © Blender Foundation | <a href="www.blender.org">www.blender.org</a>-->
+    </p>
 
     <script type="text/javascript" src="js/jquery-3.4.1.min.js"></script>
     <script type="text/javascript">
