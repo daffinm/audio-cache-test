@@ -19,7 +19,7 @@ This app is currently deployed on Firebase: https://daffinm-test.firebaseapp.com
 ## Latest news
 
 * App has been updated to add video and to enable experimentation with different audio formats and preload settings to 
-see if any of this makes a difference.
+see if any of this makes a difference. It does not seem to.
 
 ## Background reading
 * https://developers.google.com/web/tools/workbox/guides/advanced-recipes#cached-av 
