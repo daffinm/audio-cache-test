@@ -16,6 +16,12 @@ pre-cache for audio files if you want to be able to scrub through/seek within a 
 
 This app is currently deployed on Firebase: https://daffinm-test.firebaseapp.com/
 
+### Summary of results
+Pre-cached audio with a range requests enabled router play and scrub/seek fine in Chrome and Firefox when app is served 
+from localhost but fail to play in Chrome when served from Firebase. Firefox works fine in both cases.
+
+Detailed test setup, expectations and results are below.
+
 ## Latest news
 
 * App has been updated to add video and to enable experimentation with different audio formats and preload settings to 
@@ -103,16 +109,21 @@ Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko)
 Now we start seeing some really odd things... in summary:
 * When online, after initial page load all files are playable and scrub/seekable, including the pre-cached file that 
 does not have a range requests router (odd: why is this different from when running on localhost?)
+
+  ![After initial load](img/chrome-01.png "After initial load")
+
 * If I then reload/refresh the page whilst still online I start seeing errors in the workbox log for all files that 
 have range request routers:
-    ```
-    Router is responding to: /media/audio/auto-pre-cached.mp3
-    Using CacheOnly to respond to '/media/audio/auto-pre-cached.mp3'
-        No response found in the 'act-auto-pre-cache-wbv4.3.1-actv0.0.1' cache.
-        The FetchEvent for "https://daffinm-test.firebaseapp.com/media/audio/auto-pre-cached.mp3" resulted in a network error response: the promise was rejected.
-        CacheOnly.mjs:115 Uncaught (in promise) no-response: The strategy could not generate a response for 'https://daffinm-test.firebaseapp.com/media/audio/auto-pre-cached.mp3'.
-            at CacheOnly.makeRequest (https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-strategies.dev.js:343:15)
-    ```
+```
+Router is responding to: /media/audio/auto-pre-cached.mp3
+Using CacheOnly to respond to '/media/audio/auto-pre-cached.mp3'
+    No response found in the 'act-auto-pre-cache-wbv4.3.1-actv0.0.1' cache.
+    The FetchEvent for "https://daffinm-test.firebaseapp.com/media/audio/auto-pre-cached.mp3" resulted in a network error response: the promise was rejected.
+    CacheOnly.mjs:115 Uncaught (in promise) no-response: The strategy could not generate a response for 'https://daffinm-test.firebaseapp.com/media/audio/auto-pre-cached.mp3'.
+        at CacheOnly.makeRequest (https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-strategies.dev.js:343:15)
+```
+  ![After initial load](img/chrome-02.png "After initial load")
+
 * If I then unregister the service worker and refresh the page a new service worker instance is activated and 
 I am able to play all the pre-cached audio files fine.
 * When offline the pre-cached file with no range request router plays fine but the other pre-cached audio files 
