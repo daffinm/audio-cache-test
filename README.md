@@ -33,17 +33,17 @@ the app).
 
 ## Implementation
 
-I began by precaching all media. Pre-caching the audio can be done in one of two ways:
+I began by precaching all media. This can be done in one of two ways:
 1. Using [Workbox injectManifest](https://developers.google.com/web/tools/workbox/modules/workbox-cli#injectmanifest).
 1. By manually adding audio files to a cache using ```cache.add(URL)```
 
 Precaching media works fine (once you know how). But it is not very user friendly for people on slow mobile data 
-connections, or who have limited data. The first click on your site will cost them, and the app will take ages to load up.
-So really we want runtime caching. But this is not possible with Workbox 'out of the box'.
+connections, or who have limited data. The first time they click a link to your site it will cost them a ton of data, and the app will take ages to load up.
+So really we want runtime caching for media. But this is not possible with Workbox 'out of the box'.
 
 The solution is to leverage Workbox to intercept requests for media, cache the media fully, and then serve it
-from the cache. So the first time you click play on something it takes a while of you are on a slow internet 
- connection, Subsequently, however, it takes no time at all.
+from the cache. So the first time you click play on something it takes a while if you are on a slow internet 
+ connection. Subsequently, however, it takes no time at all. And you can run offline.
 
 ## Editing, testing and debugging the app locally
 At the moment the build uses a bash script. Apologies for that. I will migrate it to gulp asap.
