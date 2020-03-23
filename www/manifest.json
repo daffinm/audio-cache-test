@@ -1,12 +1,12 @@
 {
-  "name": "Audio Cache Test",
-  "short_name": "Audio Cache Test",
+  "name": "Media Cache Test",
+  "short_name": "Media Cache Test",
   "start_url": "/index.html",
   "scope": ".",
   "display": "fullscreen",
   "background_color": "#0C6A8B",
   "theme_color": "#0C6A8B",
-  "description": "Audio Cache Test App with Workbox 4",
+  "description": "Media Cache Test App with Workbox 5",
   "dir": "ltr",
   "lang": "en-UK"
 }

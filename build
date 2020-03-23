@@ -1,17 +1,63 @@
 #!/bin/bash
-WORKBOX_CONFIG=workbox-config.js
+# ----------------------------------------------------------------------------------------------------------------------
+# Variables
+# ----------------------------------------------------------------------------------------------------------------------
 SOURCE_DIR="www/"
 DEPLOY_DIR="www-deploy/"
+WORKBOX_CONFIG=workbox-config-app.js
+WORKBOX_CONFIG_MEDIA=workbox-config-media.js
+BUILD_INFO_MMR="1.0.0"
+BUILD_INFO_FILE_APP="${SOURCE_DIR}index.html"
+BUILD_INFO_FILE_SW="${SOURCE_DIR}sw.js"
 
+# ----------------------------------------------------------------------------------------------------------------------
+# Update build info in files
+# ----------------------------------------------------------------------------------------------------------------------
+function updateBuildInfoInFile() {
+    local file=$1
+    printf "\n::::: Updating Build Info in ${file}:\n"
+    # Update MMR --
+    sed -i -r "s|(const BUILD_MMR = ').*(';)|\1${BUILD_INFO_MMR}\2|g" ${file}
+    # Update the BUILD_DATE constant --
+    BUILD_DATE_OLD=$(grep "const BUILD_DATE" ${file} | sed -r -e "s/^.*'(.*)';/\1/g")
+    printf -v BUILD_DATE_NEW '%(%Y%m%d)T'
+    sed -i -r "s|(const BUILD_DATE = ').*(';)|\1${BUILD_DATE_NEW}\2|g" ${file}
+    # Update the BUILD_NUMBER constant --
+    # Reset build number if this is the first build of a new day.
+    BUILD_NUMBER=$(grep "const BUILD_NUMBER" ${file} | sed -r -e "s/^.*'(.*)';/\1/g")
+    if [[ "$BUILD_DATE_NEW" != "$BUILD_DATE_OLD" ]]; then
+        BUILD_NUMBER=1
+      else
+        BUILD_NUMBER=$((BUILD_NUMBER + 1))
+    fi
+    sed -i -r "s|(const BUILD_NUMBER = ').*(';)|\1${BUILD_NUMBER}\2|g" ${file}
+    export APP_VERSION="${BUILD_INFO_MMR}.${BUILD_DATE_NEW}#${BUILD_NUMBER}"
+    echo "APP_VERSION=${UPLIFT_VERSION}"
+    echo "APP_VERSION=${BUILD_INFO_MMR}.${BUILD_DATE_NEW}#${BUILD_NUMBER}" > ./app-version.txt
+}
+updateBuildInfoInFile $BUILD_INFO_FILE_APP
+updateBuildInfoInFile $BUILD_INFO_FILE_SW
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+# Sync the source dir into the deploy dir (just the diffs)
+# ----------------------------------------------------------------------------------------------------------------------
 printf "\n::::: Syncing ${SOURCE_DIR} to ${DEPLOY_DIR}:\n\n"
-rsync -v -a $SOURCE_DIR $DEPLOY_DIR
+rsync -v -a $SOURCE_DIR $DEPLOY_DIR --delete
 
+# ----------------------------------------------------------------------------------------------------------------------
+# Generate the list of pre-cached files with fingerprints and inject into the service worker file.
+# ----------------------------------------------------------------------------------------------------------------------
 # See https://developers.google.com/web/tools/workbox/guides/precache-files/cli
 #workbox wizard --injectManifest
 printf "\n::::: Injecting Workbox pre-cache:\n\n"
-# Overwrites sw.js file in deploy directory.
 workbox injectManifest $WORKBOX_CONFIG
+# Leverage injectManifest to get revision info for our media files so we can update the cache intelligently.
+workbox injectManifest $WORKBOX_CONFIG_MEDIA
 
+# ----------------------------------------------------------------------------------------------------------------------
+# Deploy to Firebase?
+# ----------------------------------------------------------------------------------------------------------------------
 if [ "$1" == "deploy" ]; then
   printf "\n::::: Deploying app to firebase:\n"
   if [ "$2" == "debug" ]; then
@@ -20,3 +66,5 @@ if [ "$1" == "deploy" ]; then
     firebase deploy
   fi
 fi
+
+cat ./app-version.txt

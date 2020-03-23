@@ -2,11 +2,14 @@
 .DS_Store
 /.vcs-ignore
 /node_modules/
+/.archive/
 /tmp
 /test*
 /logs
 /.firebase
 /www-deploy
+/app-version.txt
+
 package-lock.json
 
 # ====================================================

@@ -4,10 +4,10 @@
 
 module.exports = {
   "globDirectory": "www/",
-  "globPatterns": [
-    "{index.html,media/*/auto-pre-cached*,**/*.js}"
+  globIgnores: [
+    '**/media/*',
+    'sw.js',
   ],
-  "swSrc" : "www/sw.js",
-  "swDest": "www-deploy/sw.js",
-  "maximumFileSizeToCacheInBytes": 4 * 1024 * 1024
+  swSrc: "www/sw.js",
+  swDest: "www-deploy/sw.js",
 };

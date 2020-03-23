@@ -2,26 +2,24 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Audio Cache Test</title>
+    <title>Workbox Media Cache Test</title>
     <meta id="meta-viewport" name="viewport" content="user-scalable=yes, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">
-    <!-- Avoid fake favicon requests to reduce console noise. -->
-    <link rel="shortcut icon" href="data:image/x-icon;," type="image/x-icon">
+    <script type="text/javascript" src="js/jquery-3.4.1.min.js"></script>
+    <script src="js/debug.js"></script>
+    <script defer src="js/sw-client.js"></script>
+    <script>
+        const BUILD_MMR = '1.0.0';
+        const BUILD_DATE = '20200323';
+        const BUILD_NUMBER = '14';
+        const APP_VERSION = `${BUILD_MMR}.${BUILD_DATE}#${BUILD_NUMBER}`;
+        setDebug(true, `[${APP_VERSION}] [Application]:`, '@@');
+    </script>
+
     <style>
         body {
             background-color: black;
             color: white;
             margin: 1rem 1rem 2rem 1rem;
-        }
-        .media-settings, .media-container {
-            border: solid 1px greenyellow;
-            border-radius: 10px;
-            margin-bottom: 1rem;
-        }
-        .media-settings {
-            padding: 0 1rem 0 1rem;
-        }
-        .media-settings h3 {
-            display: inline-block;
         }
         .media {
             display: flex;
@@ -31,24 +29,16 @@
         .media-container {
             padding: 0 1rem 1rem 1rem;
             height: fit-content;
-            height: -moz-fit-content;
             width: fit-content;
             width: -moz-fit-content;
-            margin-right: 1rem;
+            margin: 1rem auto;
+            border: solid 1px greenyellow;
+            border-radius: 10px;
         }
         .highlight {
             border: solid 1px greenyellow;
             border-radius: 10px;
         }
-/*
-        @media only screen and (min-width : 700px) {
-            .media-container {
-                display: inline-block;
-                vertical-align:top;
-                margin-right: 0.5rem;
-            }
-        }
-*/
         a:link {
             color: greenyellow;
         }
@@ -61,110 +51,36 @@
         a:active {
             color: yellow;
         }
-        th {
-            text-align: left;
+        #message-board {
+            margin: 1rem 0;
+            min-height: 20px;
         }
     </style>
-    <script type="text/javascript">
-        function applog(message, object) {
-            console.log(`[ACT App] ${message}`, object ? object : '');
-        }
-    </script>
 </head>
 <body>
-    <div class="media-settings">
-        <h3>Media Settings:</h3>
-        <label for="audio-format">Audio Format</label>
-        <select id="audio-format">
-            <option selected value=".mp3">MP3</option>
-            <option value=".m4a">M4A</option>
-        </select>
-        <label for="crossorigin">Crossorigin</label>
-        <select id="crossorigin">
-            <option selected value="anonymous">anonymous</option>
-            <option value="use-credentials">use-credentials</option>
-            <option value="none">none</option>
-        </select>
-    </div>
+    <h2>Media Cache Test <span class="version"></span></h2>
     <div class="media">
-
         <div class="media-container">
-            <h3>Audio: Preload=metadata</h3>
-            <h4>Auto pre-cached (no range requests)</h4>
-            <audio controls preload="metadata" crossorigin="anonymous" src="media/audio/auto-pre-cached-no-router.mp3"></audio>
-            <h4>Auto pre-cached</h4>
-            <audio controls preload="metadata" crossorigin="anonymous" src="media/audio/auto-pre-cached.mp3"></audio>
-            <h4>Manually pre-cached</h4>
-            <audio controls preload="metadata" crossorigin="anonymous" src="media/audio/manually-pre-cached.mp3"></audio>
-            <h4>Not cached</h4>
-            <audio controls preload="metadata" crossorigin="anonymous" src="media/audio/not-cached.mp3"></audio>
+            <h3>Audio: Preload=none</h3>
+            <audio controls preload="none" crossorigin="anonymous" src="media/song.mp3"></audio>
         </div>
 
         <div class="media-container">
-            <h3>Audio: Preload=auto</h3>
-            <h4>Auto pre-cached (no range requests)</h4>
-            <audio controls preload="auto" crossorigin="anonymous" src="media/audio/auto-pre-cached-no-router.mp3"></audio>
-            <h4>Auto pre-cached</h4>
-            <audio controls preload="auto" crossorigin="anonymous" src="media/audio/auto-pre-cached.mp3"></audio>
-            <h4>Manually pre-cached</h4>
-            <audio controls preload="auto" crossorigin="anonymous" src="media/audio/manually-pre-cached.mp3"></audio>
-            <h4>Not cached</h4>
-            <audio controls preload="auto" crossorigin="anonymous" src="media/audio/not-cached.mp3"></audio>
-        </div>
-
-        <div class="media-container">
-            <h3>Video: Preload=metadata</h3>
-            <h4>Auto pre-cached (no range requests)</h4>
-            <video controls preload="metadata" crossorigin="anonymous" src="media/video/auto-pre-cached-no-router.mp4"></video>
-            <h4>Auto pre-cached</h4>
-            <video controls preload="metadata" crossorigin="anonymous" src="media/video/auto-pre-cached.mp4"></video>
-            <h4>Manually pre-cached</h4>
-            <video controls preload="metadata" crossorigin="anonymous" src="media/video/manually-pre-cached.mp4"></video>
-            <h4>Not cached</h4>
-            <video controls preload="metadata" crossorigin="anonymous" src="media/video/not-cached.mp4"></video>
-        </div>
-
-        <div class="media-container">
-            <h3>Video: Preload=auto</h3>
-            <h4>Auto pre-cached (no range requests)</h4>
-            <video controls preload="auto" crossorigin="anonymous" src="media/video/auto-pre-cached-no-router.mp4"></video>
-            <h4>Auto pre-cached</h4>
-            <video controls preload="auto" crossorigin="anonymous" src="media/video/auto-pre-cached.mp4"></video>
-            <h4>Manually pre-cached</h4>
-            <video controls preload="auto" crossorigin="anonymous" src="media/video/manually-pre-cached.mp4"></video>
-            <h4>Not cached</h4>
-            <video controls preload="auto" crossorigin="anonymous" src="media/video/not-cached.mp4"></video>
+            <h3>Video: Preload=none</h3>
+            <video controls preload="none" crossorigin="anonymous" src="media/video.mp4"></video>
         </div>
 
     </div>
-
+    <div id="buttons">
+    </div>
+    <div id="message-board"></div>
+    <hr>
     <p>Media used in demo:
         Audio © 2003 Miaow / Arnaud Laflaquiere - <a href="http://www.miaowmusic.net" target="_blank">MiaowMusic.net</a><br>
-        <!--Video © Blender Foundation | <a href="www.blender.org">www.blender.org</a>-->
+        Video © Blender Foundation | <a href="www.blender.org">www.blender.org</a>
     </p>
-
-    <script type="text/javascript" src="js/jquery-3.4.1.min.js"></script>
     <script type="text/javascript">
-        function stopAllMedia() {
-            $('audio,video').each(function () {
-                this.pause(); // Stop playing
-                this.currentTime = 0; // Reset time
-            });
-        }
         $(document).ready(function () {
-            if ('serviceWorker' in navigator) {
-                applog('This browser supports service workers.');
-                navigator.serviceWorker
-                    .register('sw.js')
-                    .then(function () {
-                        applog('ServiceWorker registered!');
-                    })
-                    .catch(function (err) {
-                        applog('Cannot register service worker:', err);
-                    });
-            } else {
-                applog('This browser DOES NOT support service workers.');
-            }
             let $media = $('audio,video');
             $media.on('play', function () {
                 $('audio,video').not(this).each(function(){
@@ -173,38 +89,13 @@
                 });
             });
             $media.on('error', function (e) {
-                applog(`Error loading ${this.src}`, e);
+                debug.error(`Error loading ${this.src}`, e);
             });
             if (!/Chrome/.test(navigator.userAgent)) {
                 $media.addClass('highlight');
             }
-            $('#audio-format').on('change', function () {
-                stopAllMedia();
-                let extension = this.value;
-                $media.each(function () {
-                    let $audio = $(this);
-                    let src = $audio.attr('src').replace(/\.(mp3|m4a)$/, extension);
-                    $audio.attr('src', src);
-                })
-            });
-            $('#crossorigin').on('change', function () {
-                stopAllMedia();
-                let value = this.value;
-                if (value === "none") {
-                    $media.removeAttr('crossorigin');
-                } else {
-                    $media.attr('crossorigin', this.value);
-                }
-            });
+            $('.version').text(`v${APP_VERSION}`);
         });
     </script>
-
-    <!-- The core Firebase JS SDK is always required and must be listed first -->
-    <!--<script src="/__/firebase/7.0.0/firebase-app.js"></script>-->
-    <!-- TODO: Add SDKs for Firebase products that you want to use
-         https://firebase.google.com/docs/web/setup#available-libraries -->
-    <!-- Initialize Firebase -->
-    <!--<script src="/__/firebase/init.js"></script>-->
-
 </body>
 </html>
