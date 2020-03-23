@@ -41,13 +41,24 @@ I began by precaching all media. This can be done in one of two ways:
 1. Using [Workbox injectManifest](https://developers.google.com/web/tools/workbox/modules/workbox-cli#injectmanifest).
 1. By manually adding audio files to a cache using ```cache.add(URL)``` (see [here](https://github.com/GoogleChrome/workbox/issues/1663#issuecomment-450999270))
 
-Precaching media works fine (once you know how to make it work). But it is not very user-friendly for people on slow mobile data 
-connections, or who have limited data. The first time they click a link to your site it will cost them a ton of data, and the app will take ages to load up.
-So, really, we want runtime caching for media. But this is not possible with Workbox 'out of the box'.
+Precaching media works fine (once you know how to make it work). 
+1. Generate a list of media files to precache using `injectManifest`
+1. [Register a route](https://developers.google.com/web/tools/workbox/modules/workbox-routing) with Workbox that intercepts
+requests for media and routes them to the precache via a handler that is configured to deal with range requests. 
 
-The solution is to leverage Workbox to intercept requests for media, cache the media fully, and then serve it
-from the cache. So the first time you click play on something it takes a while if you are on a slow internet 
- connection. Subsequently, however, it takes no time at all. And you can run offline.
+But precaching media it is not very user-friendly for people on slow mobile data connections, or who have limited data. 
+The first time they click a link to your site they will get a lot more data than they may have bargained for, 
+and the app will take ages to load up because your bandwidth will be used up by the service worker as it installs and loads
+the precache. 
+
+What we really want is runtime caching for media. But this is not possible with Workbox 'out of the box' because we are
+dealing with partial range requests. "Please just give me a bit of this file, not the whole thing...' And we can't cache
+bits of files. It just won't work. 
+
+The solution is to leverage Workbox to intercept requests for media, ignore the range part of the request, cache the 
+media fully, and then serve it from the cache. So the first time you click play it takes a while if you are on a slow internet 
+ connection. Subsequently, however, it takes no time at all. And you can run offline. (I am using a customised version of 
+ and old project called [CirclePlayer](https://github.com/maboa/circleplayer) with a [CSS loading spinner](https://projects.lukehaas.me/css-loaders/) to get round this.)
 
 #### Keeping the cache up to date
  
