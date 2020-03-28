@@ -3,7 +3,7 @@
 // =====================================================================================================================
 const BUILD_MMR = '1.0.0';
 const BUILD_DATE = '20200328';
-const BUILD_NUMBER = '14';
+const BUILD_NUMBER = '20';
 const APP_VERSION = `${BUILD_MMR}.${BUILD_DATE}#${BUILD_NUMBER}`;
 
 importScripts('/js/debug.js');
