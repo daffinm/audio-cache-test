@@ -1,10 +1,11 @@
 
 var __no_op = function() {};
 var __no_op_object = {
+    section: __no_op,
     log: __no_op,
-    error: __no_op,
+    info: __no_op,
     warn: __no_op,
-    info: __no_op
+    error: __no_op,
 };
 // Default is no op.
 var debug = self.debug = __no_op_object;

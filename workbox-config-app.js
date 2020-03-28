@@ -3,7 +3,7 @@
 // For args @see https://developers.google.com/web/tools/workbox/modules/workbox-cli
 
 module.exports = {
-  "globDirectory": "www/",
+  globDirectory: "www/",
   globIgnores: [
     '**/media/*',
     'sw.js',
