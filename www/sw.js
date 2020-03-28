@@ -3,13 +3,14 @@
 // =====================================================================================================================
 const BUILD_MMR = '1.0.0';
 const BUILD_DATE = '20200328';
-const BUILD_NUMBER = '3';
+const BUILD_NUMBER = '14';
 const APP_VERSION = `${BUILD_MMR}.${BUILD_DATE}#${BUILD_NUMBER}`;
 
 importScripts('/js/debug.js');
 setDebug(true, `[${APP_VERSION}] {{Service Worker}}:`, '>>');
+debug.section(`SERVICE WORKER STARTING >> Version ${APP_VERSION}`);
 
-const WORKBOX_DEBUG = true;
+const WORKBOX_DEBUG = false;
 const WORKBOX_VERSION = '5.1.1';
 const APP_CACHE_PREFIX = 'mct';
 const APP_CACHE_SUFFIX = `v1.0.0`;

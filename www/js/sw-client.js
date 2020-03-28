@@ -17,13 +17,15 @@ const SwClient = {
         if (!('serviceWorker' in navigator)) return;
 
         // Reload once when the new Service Worker starts activating
+        debug.log('Adding controllerchange listener.');
         let refreshing = false;
-        navigator.serviceWorker.addEventListener('controllerchange', function() {
+        navigator.serviceWorker.oncontrollerchange = function(controllerchangeevent) {
+            // navigator.serviceWorker.addEventListener('controllerchange', function() {
             if (refreshing) return;
             debug.warn('controllerchange >> refreshing page!');
             refreshing = true;
             window.location.reload();
-        });
+        };
 
         function promptUserToRefreshIfNecessary(reg) {
             SwClient._logRegistration(reg, 'promptUserToRefreshIfNecessary');
@@ -36,6 +38,12 @@ const SwClient = {
                 if (confirm(`An update is available for this app. Use it now?`)) {
                     debug.log("User wishes to use update NOW.");
                     SwClient.sendMessageToUser('Installing update...');
+                    // See https://github.com/GoogleChrome/workbox/issues/2411#issuecomment-604505853
+                    if (!navigator.serviceWorker.controller) {
+                        setTimeout(function () {
+                            window.location.reload();
+                        }, 2000);
+                    }
                     return sendMessageToServiceWorker(newServiceWorker, MESSAGES.SKIP_WAITING);
                 }
                 else {

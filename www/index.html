@@ -10,7 +10,7 @@
     <script>
         const BUILD_MMR = '1.0.0';
         const BUILD_DATE = '20200328';
-        const BUILD_NUMBER = '3';
+        const BUILD_NUMBER = '14';
         const APP_VERSION = `${BUILD_MMR}.${BUILD_DATE}#${BUILD_NUMBER}`;
         setDebug(true, `[${APP_VERSION}] [Application]:`, '@@');
     </script>
@@ -21,17 +21,12 @@
             color: white;
             margin: 1rem 1rem 2rem 1rem;
         }
-        .media {
-            display: flex;
-            justify-content: left;
-            flex-flow: row wrap;
-        }
         .media-container {
             padding: 0 1rem 1rem 1rem;
             height: fit-content;
             width: fit-content;
             width: -moz-fit-content;
-            margin: 1rem auto;
+            margin: 1rem;
             border: solid 1px greenyellow;
             border-radius: 10px;
         }
@@ -57,35 +52,37 @@
         }
         button {
             border-radius: 50px;
-            padding: 5px;
+            padding: 10px;
         }
         button:focus {
             outline: none;
+        }
+        .attribution {
+            font-size: small;
+            display: block;
+            margin-top: 5px;
         }
     </style>
 </head>
 <body>
     <h2>Media Cache Test <span class="version"></span></h2>
-    <div class="media">
-        <div class="media-container">
-            <h3>Audio: Preload=none</h3>
-            <audio controls preload="none" crossorigin="anonymous" src="media/song.mp3"></audio>
-        </div>
 
-        <div class="media-container">
-            <h3>Video: Preload=none</h3>
-            <video controls preload="none" crossorigin="anonymous" src="media/video.mp4"></video>
-        </div>
+    <div class="media-container">
+        <h3>Audio</h3>
+        <audio controls preload="none" crossorigin="anonymous" src="media/song.mp3"></audio>
+        <span class="attribution">Audio © 2003 Miaow / Arnaud Laflaquiere - <a href="http://www.miaowmusic.net" target="_blank">MiaowMusic.net</a></span>
+    </div>
 
+    <div class="media-container">
+        <h3>Video</h3>
+        <video controls preload="none" crossorigin="anonymous" src="media/video.mp4"></video>
+        <span class="attribution">Video © Blender Foundation | <a href="www.blender.org">www.blender.org</a></span>
     </div>
-    <div id="buttons">
-    </div>
+
+    <div id="buttons"></div>
+
     <div id="message-board"></div>
-    <hr>
-    <p>Media used in demo:
-        Audio © 2003 Miaow / Arnaud Laflaquiere - <a href="http://www.miaowmusic.net" target="_blank">MiaowMusic.net</a><br>
-        Video © Blender Foundation | <a href="www.blender.org">www.blender.org</a>
-    </p>
+
     <script type="text/javascript">
         $(document).ready(function () {
             let $media = $('audio,video');
