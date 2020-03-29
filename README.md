@@ -1,7 +1,10 @@
 # Media Cache Test
 [PWA](https://en.wikipedia.org/wiki/Progressive_web_application) test project to find out how to get audio caching working with [Workbox](https://developers.google.com/web/tools/workbox), 
 including scrub/seek using the [range requests plugin](https://developers.google.com/web/tools/workbox/modules/workbox-range-requests).
-
+---
+__Note:__ the version on this branch uses the same caching strategy to handle runtime caching of all 
+resources in the app except the bare bones - index.html etc. It seems highly performant in Lighthouse.
+---
 Workbox caching is great unless you want to cache media (audio/video). Then it gets complex, and things start not working, 
 and you begin to wonder if you will ever get your PWA working with cached media, or if
 you made some hideous mistake by ever thinking that this was a good idea...
@@ -34,7 +37,6 @@ See [SwClient.js](https://github.com/daffinm/audio-cache-test/blob/master/www/js
 * I want the app to cache all media (audio/video) and for this media to be playable offline, including scrub/seek.
 * I want to be able to update cached media easily, including removal of orphan files (stuff that has been removed from
 the app).
-
 
 ## Implementation
 
@@ -75,8 +77,23 @@ The code is all documented, or self-documenting. I hope that you can make sense 
 And if you can think of any improvements please suggest them in the usual manner.
 
 See:
+
 1. [sw.js](https://github.com/daffinm/audio-cache-test/blob/master/www/js/sw.js)
 1. [workbox-utils.js](https://github.com/daffinm/audio-cache-test/blob/master/www/js/workbox-utils.js)
+
+#### What do you call it?
+
+So this project uses a new caching strategy which you could call 'CacheFullyFirst' or 'CachBeforeCacheOnly'. Not sure. 
+What does it do?
+
+1. It caches resources at runtime - on-demand. 
+1. It seems to be able to handle pretty much any kind of resource, including media (audio/video).
+1. It caches any resource in scope (see below) fully the first time it is is requested and serves this resource using a 
+[CacheOnly strategy](https://developers.google.com/web/tools/workbox/modules/workbox-strategies#cache_only) from then on.
+1. Leverages [Workbox injectManifest](https://developers.google.com/web/tools/workbox/modules/workbox-cli#injectmanifest) 
+to build a runtime manifest of all the files in the app that we want to cache eventually. This enables us:
+   * To remove orphaned files: At startup, any cached files that do no appear in the runtime manifest are deleted from the cache.  
+   * To detect updates easily: If the revision of a cached file has changed then the cache is updated with the new version.
 
 ##### Media element settings
 Note that the media elements are configured as follows: 
@@ -89,10 +106,10 @@ Note that the media elements are configured as follows:
    Sometimes, at pageload, the metadata request is intercepted by the service worker and the media file is cached. And
    other times it seems that Chrome caches the media file and no further requests are received for it. So if you want
    consistent results use `preload=none` .
-  
 1. `crossorigin=anonymous`: 
    * Because this is needed to get caching working. Not exactly sure why. 
-   * See [this thread with Jeff Posnick](https://stackoverflow.com/questions/57903010/cannot-scrub-scroll-through-jplayer-audio-when-mp3-is-cached-by-workbox) for more information.  
+   * See [this thread with Jeff Posnick](https://stackoverflow.com/questions/57903010/cannot-scrub-scroll-through-jplayer-audio-when-mp3-is-cached-by-workbox) for more information.
+1. Timestamp appended to end of src to facilitate testing. (See note in index.html)  
 
 ## Editing, testing and debugging the app locally
 At the moment the build uses a bash script. Apologies for that. I will migrate it to gulp ASAP. (So much has happened

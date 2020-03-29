@@ -1,6 +1,6 @@
 // Has a dependency on assert object defined in common.js.
 function WorkboxCacheFileInfo(fileInfoArray) {
-    /*private*/ function initFileInfoMap(fileInfoArray) {
+    function initFileInfoMap(fileInfoArray) {
         let map = {};
         for (let info of fileInfoArray) {
             assert.isDefined(info.url, `info.url`);
@@ -9,7 +9,7 @@ function WorkboxCacheFileInfo(fileInfoArray) {
         }
         return map;
     }
-    /*private*/ function getRelativeUrlFrom(url) {
+    function getRelativeUrlFrom(url) {
         // Strip any parameters
         url = url.replace(/\?.*$/, '').trim();
         // Grab the relative URL
@@ -21,20 +21,20 @@ function WorkboxCacheFileInfo(fileInfoArray) {
     const FILE_INFO_MAP = initFileInfoMap(fileInfoArray);
     const WORKBOX_REVISION_PARAM = '__WB_REVISION__';
 
-    this.getLatestRevisionFor = function (url) {
+    this.getRevisionFor = function (url) {
         let key = getRelativeUrlFrom(url);
         let revision = FILE_INFO_MAP[key];
         return revision;
     };
-    this.hasLatestRevisionFor = function (url) {
-        if (this.getLatestRevisionFor(url)) {
+    this.hasRevisionFor = function (url) {
+        if (this.getRevisionFor(url)) {
             return true;
         }
         return false;
     };
-    this.addLatestRevisionParameterTo = function (url) {
-        assert.isTrue(this.hasLatestRevisionFor(url), `Bug: No revision found for ${url}`);
-        let revision = this.getLatestRevisionFor(url);
+    this.addRevisionParameterTo = function (url) {
+        assert.isTrue(this.hasRevisionFor(url), `Bug: No revision found for ${url}`);
+        let revision = this.getRevisionFor(url);
         return `${url}?${WORKBOX_REVISION_PARAM}=${revision}`;
     };
     this.getRevisionParameterFrom = function (url) {
@@ -48,10 +48,11 @@ function WorkboxCacheFileInfo(fileInfoArray) {
 }
 
 // Implements the workbox routing RouteHanderObject's handle method.
-function WorkboxCacheFullyThenCacheOnly(serviceWorkerExecutionContext, cacheName, cacheFileInfoArray) {
+function WorkboxCacheBeforeCacheOnly(serviceWorkerExecutionContext, cacheName, cacheFileInfoArray) {
 
     const CACHE_MATCH_OPTIONS = Object.freeze({ignoreSearch: true, ignoreVary: true});
     const CACHE_NAME = cacheName;
+    this.cacheName = CACHE_NAME; //for debugging.
     const CACHE_FILE_INFO = new WorkboxCacheFileInfo(cacheFileInfoArray);
 
     const myCacheOnlyRouteHandler = new workbox.strategies.CacheOnly({
@@ -68,16 +69,13 @@ function WorkboxCacheFullyThenCacheOnly(serviceWorkerExecutionContext, cacheName
         }
         // TODO add expiration plugin? https://developers.google.com/web/tools/workbox/modules/workbox-expiration
     });
-
-    /*private*/ function deleteOrphansFromCache(activationEvent) {
-        // debug.log(`Deleting orphans from cache [${CACHE_NAME}]`);
-        // debugger;
+    function deleteOrphansFromCache(activationEvent) {
         activationEvent.waitUntil(
             caches.open(CACHE_NAME).then(function(cache) {
                 cache.keys().then(function(keys) {
                     for (let response of keys) {
                         let cachedUrl = response.url;
-                        let isCachedFileOrphan = !CACHE_FILE_INFO.hasLatestRevisionFor(cachedUrl);
+                        let isCachedFileOrphan = !CACHE_FILE_INFO.hasRevisionFor(cachedUrl);
                         if (isCachedFileOrphan) {
                             debug.log(`Deleting orphan response from [${CACHE_NAME}]:\n${cachedUrl}`);
                             cache.delete(cachedUrl, CACHE_MATCH_OPTIONS);
@@ -85,9 +83,9 @@ function WorkboxCacheFullyThenCacheOnly(serviceWorkerExecutionContext, cacheName
                     }
                 });
             })
-            .catch(function (error) {
-                debug.error(`Problem deleting orphan(s) from cache '${CACHE_NAME}':\n${error}`);
-            })
+                .catch(function (error) {
+                    debug.error(`Problem deleting orphan(s) from cache '${CACHE_NAME}':\n${error}`);
+                })
         );
     }
     // Tune in to the service worker lifecycle so we can manage our cache.
@@ -95,49 +93,56 @@ function WorkboxCacheFullyThenCacheOnly(serviceWorkerExecutionContext, cacheName
         deleteOrphansFromCache(event);
     });
 
+    function stripParametersFrom(url) {
+        return url.replace(/\?.*$/, '').trim();
+    }
     // Add the file to the cache if it has not already been added, or update the cache if a newer file exists
     // in the file revision data provided - wbCacheFileInfo
-    /*private*/ addToCache = async function (url) {
-        // debug.log(`Caching reponse in [${CACHE_NAME}] if necessary:\n${url}`);
+    async function updateCacheAsNecessary(url) {
+        url = stripParametersFrom(url);
         const cache = await caches.open(CACHE_NAME);
         assert.isTrue(cache, `Cannot open cache '${CACHE_NAME}'`);
         let alreadyCached = (await cache.match(url, CACHE_MATCH_OPTIONS));
         if (alreadyCached) {
             debug.log(`Response is already cached in [${CACHE_NAME}]:\n${url}`);
             let cachedRevision = CACHE_FILE_INFO.getRevisionParameterFrom(alreadyCached.url);
-            // Handle previous version of code that did not use revision param.
+            // Handle case where previously cached resource did not use revision param.
             if (!cachedRevision) {
                 debug.log(`NO VERSION INFO! Re-caching response in [${CACHE_NAME}]:\n${url}`);
                 await cache.delete(url, CACHE_MATCH_OPTIONS);
-                let urlToCache = CACHE_FILE_INFO.addLatestRevisionParameterTo(url);
+                let urlToCache = CACHE_FILE_INFO.addRevisionParameterTo(url);
                 await cache.add(urlToCache);
             } else {
-                let latestRevision = CACHE_FILE_INFO.getLatestRevisionFor(url);
+                let latestRevision = CACHE_FILE_INFO.getRevisionFor(url);
                 assert.isDefined(latestRevision, 'latestRevision', `Bug: Cannot find latest revision info for file: ${url}`);
                 if (cachedRevision !== latestRevision) {
                     debug.log(`NEW VERSION DETECTED!\n - Cached revision: ${cachedRevision}\n - Latest revision: ${latestRevision}\nRe-caching response in [${CACHE_NAME}]:${url}`);
                     await cache.delete(url, CACHE_MATCH_OPTIONS);
-                    let urlToCache = CACHE_FILE_INFO.addLatestRevisionParameterTo(url);
+                    let urlToCache = CACHE_FILE_INFO.addRevisionParameterTo(url);
                     await cache.add(urlToCache);
                 }
             }
 
         } else {
             debug.log(`NOT CACHED! Caching response fully in [${CACHE_NAME}]:\n${url}`);
-            let urlToCache = CACHE_FILE_INFO.addLatestRevisionParameterTo(url);
+            let urlToCache = CACHE_FILE_INFO.addRevisionParameterTo(url);
             await cache.add(urlToCache);
         }
     };
-
-    // The Workbox RouteHandler strategy interface method. So we can use an instance of this class as the second
-    // argument to workbox.routing.registerRoute.
-    // See https://developers.google.com/web/tools/workbox/modules/workbox-routing
-    // TODO this is the only public method that this class really needs. Other methods are made public for testing purposes.
+    // =================================================================================================================
+    // The public interface: matching and handling.
+    // See https://developers.google.com/web/tools/workbox/modules/workbox-routing#matching_and_handling_in_routes
+    // =================================================================================================================
+    this.match = function ({url, event}) {
+        assert.isTrue(url instanceof URL, 'url is not a URL', url);
+        let matches = CACHE_FILE_INFO.hasRevisionFor(url.href);
+        // debugger;
+        return matches;
+    };
     this.handle = async function ({event, request}) {
         // debugger;
-        await addToCache(request.url);
+        await updateCacheAsNecessary(request.url);
         debug.log(`Responding to request from cache [${CACHE_NAME}]:\n${request.url}`);
         return myCacheOnlyRouteHandler.handle({event, request});
     };
-
 }
