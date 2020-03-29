@@ -1,10 +1,10 @@
 # Media Cache Test
 [PWA](https://en.wikipedia.org/wiki/Progressive_web_application) test project to find out how to get audio caching working with [Workbox](https://developers.google.com/web/tools/workbox), 
 including scrub/seek using the [range requests plugin](https://developers.google.com/web/tools/workbox/modules/workbox-range-requests).
----
+
 __Note:__ the version on this branch uses the same caching strategy to handle runtime caching of all 
 resources in the app except the bare bones - index.html etc. It seems highly performant in Lighthouse.
----
+
 Workbox caching is great unless you want to cache media (audio/video). Then it gets complex, and things start not working, 
 and you begin to wonder if you will ever get your PWA working with cached media, or if
 you made some hideous mistake by ever thinking that this was a good idea...
