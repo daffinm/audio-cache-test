@@ -3,7 +3,7 @@
 // =====================================================================================================================
 const BUILD_MMR = '1.0.0';
 const BUILD_DATE = '20200331';
-const BUILD_NUMBER = '105';
+const BUILD_NUMBER = '144';
 const APP_VERSION = `${BUILD_MMR}.${BUILD_DATE}#${BUILD_NUMBER}`;
 
 const DEBUG = false;

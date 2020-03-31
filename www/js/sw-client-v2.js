@@ -27,7 +27,7 @@ const SwClientV2 = {
             }, 5000);
         }
         function createUIPrompt({onAccept, onReject, finder}) {
-            if (confirm(`[${finder}]: An update is available for this app.\n\nUse it now?`)) {
+            if (confirm(`[Finder = ${finder}]:\nAn update is available for this app.\nUse it now?`)) {
                 onAccept();
             }
             else {
@@ -48,25 +48,30 @@ const SwClientV2 = {
             //     }, 2000);
             // });
             // TODO whilst this one never fails. Need to report this.
-            navigator.serviceWorker.oncontrollerchange = function(controllerchangeevent) {
-                // $('body').css('color', 'red');
+            navigator.serviceWorker.oncontrollerchange = function(e) {
                 sendMessageToUser('Reloading application...', true);
                 setTimeout(function () {
                     window.location.reload();
-                }, 2000);
+                }, 3000);
             };
         }
 
+        let alreadyUpdating = false;
         function handleUpdateFound(newServiceWorker, finder) {
-            createUIPrompt({
-                onAccept: async () => {
-                    messageSW(newServiceWorker, {message: 'SKIP_WAITING'});
-                },
-                onReject: () => {
-                    sendMessageToUser('The update will be activated later.');
-                },
-                finder: finder
-            });
+            // Gate this because can be called from a listener or because a button has been pressed.
+            // So can get called twice in some browsers.
+            if (!alreadyUpdating) {
+                alreadyUpdating = true;
+                createUIPrompt({
+                    onAccept: async () => {
+                        messageSW(newServiceWorker, {message: 'SKIP_WAITING'});
+                    },
+                    onReject: () => {
+                        sendMessageToUser('The update will be activated later.');
+                    },
+                    finder: finder
+                });
+            }
         }
         function checkForUpdates(wb, headless) {
             if (!headless) sendMessageToUser(`Checking for updates.... I'll let you know if I find some :-)`);

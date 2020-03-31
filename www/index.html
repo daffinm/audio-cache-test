@@ -9,7 +9,7 @@
     <script>
         const BUILD_MMR = '1.0.0';
         const BUILD_DATE = '20200331';
-        const BUILD_NUMBER = '105';
+        const BUILD_NUMBER = '144';
         const APP_VERSION = `${BUILD_MMR}.${BUILD_DATE}#${BUILD_NUMBER}`;
         const debug = new Debug(false, `[${APP_VERSION}] [Application]:`, '@');
     </script>
@@ -61,6 +61,12 @@
         }
         video {
             max-height: 150px;
+        }
+        .highlight {
+            border: solid 1px greenyellow;
+        }
+        audio.highlight {
+            border-radius: 10px;
         }
         span.warning {
             -webkit-animation: blink .75s linear infinite;
