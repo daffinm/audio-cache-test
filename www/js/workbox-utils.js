@@ -1,4 +1,4 @@
-// Has a dependency on assert object defined in common.js.
+
 function WorkboxCacheFileInfo(fileInfoArray) {
     function initFileInfoMap(fileInfoArray) {
         let map = {};
@@ -91,44 +91,49 @@ function WorkboxCacheBeforeCacheOnly(serviceWorkerExecutionContext, cacheName, c
     // Tune in to the service worker lifecycle so we can manage our cache.
     serviceWorkerExecutionContext.addEventListener('activate', function(event) {
         deleteOrphansFromCache(event);
+        // Why not delete old versions of stuff whilst you are at it? Because we need to be offline first, so
+        // only look for updates at runtime. An old version is better than no version at at all.
     });
 
     function stripParametersFrom(url) {
         return url.replace(/\?.*$/, '').trim();
     }
+    let myCache = null;
     // Add the file to the cache if it has not already been added, or update the cache if a newer file exists
     // in the file revision data provided - wbCacheFileInfo
     async function updateCacheAsNecessary(url) {
         url = stripParametersFrom(url);
-        const cache = await caches.open(CACHE_NAME);
-        assert.isTrue(cache, `Cannot open cache '${CACHE_NAME}'`);
-        let alreadyCached = (await cache.match(url, CACHE_MATCH_OPTIONS));
+        if (myCache === null) {
+            myCache = await caches.open(CACHE_NAME);
+            assert.isTrue(myCache, `Cannot open cache '${CACHE_NAME}'`);
+        }
+        let alreadyCached = (await myCache.match(url, CACHE_MATCH_OPTIONS));
         if (alreadyCached) {
             debug.log(`Response is already cached in [${CACHE_NAME}]:\n${url}`);
             let cachedRevision = CACHE_FILE_INFO.getRevisionParameterFrom(alreadyCached.url);
             // Handle case where previously cached resource did not use revision param.
             if (!cachedRevision) {
                 debug.log(`NO VERSION INFO! Re-caching response in [${CACHE_NAME}]:\n${url}`);
-                await cache.delete(url, CACHE_MATCH_OPTIONS);
+                await myCache.delete(url, CACHE_MATCH_OPTIONS);
                 let urlToCache = CACHE_FILE_INFO.addRevisionParameterTo(url);
-                await cache.add(urlToCache);
+                await myCache.add(urlToCache);
             } else {
                 let latestRevision = CACHE_FILE_INFO.getRevisionFor(url);
                 assert.isDefined(latestRevision, 'latestRevision', `Bug: Cannot find latest revision info for file: ${url}`);
                 if (cachedRevision !== latestRevision) {
                     debug.log(`NEW VERSION DETECTED!\n - Cached revision: ${cachedRevision}\n - Latest revision: ${latestRevision}\nRe-caching response in [${CACHE_NAME}]:${url}`);
-                    await cache.delete(url, CACHE_MATCH_OPTIONS);
+                    await myCache.delete(url, CACHE_MATCH_OPTIONS);
                     let urlToCache = CACHE_FILE_INFO.addRevisionParameterTo(url);
-                    await cache.add(urlToCache);
+                    await myCache.add(urlToCache);
                 }
             }
 
         } else {
             debug.log(`NOT CACHED! Caching response fully in [${CACHE_NAME}]:\n${url}`);
             let urlToCache = CACHE_FILE_INFO.addRevisionParameterTo(url);
-            await cache.add(urlToCache);
+            await myCache.add(urlToCache);
         }
-    };
+    }
     // =================================================================================================================
     // The public interface: matching and handling.
     // See https://developers.google.com/web/tools/workbox/modules/workbox-routing#matching_and_handling_in_routes
@@ -136,7 +141,6 @@ function WorkboxCacheBeforeCacheOnly(serviceWorkerExecutionContext, cacheName, c
     this.match = function ({url, event}) {
         assert.isTrue(url instanceof URL, 'url is not a URL', url);
         let matches = CACHE_FILE_INFO.hasRevisionFor(url.href);
-        // debugger;
         return matches;
     };
     this.handle = async function ({event, request}) {

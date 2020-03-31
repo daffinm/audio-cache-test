@@ -9,10 +9,10 @@
     <script defer src="js/sw-client.js"></script>
     <script>
         const BUILD_MMR = '1.0.0';
-        const BUILD_DATE = '20200329';
-        const BUILD_NUMBER = '42';
+        const BUILD_DATE = '20200331';
+        const BUILD_NUMBER = '2';
         const APP_VERSION = `${BUILD_MMR}.${BUILD_DATE}#${BUILD_NUMBER}`;
-        setDebug(false, `[${APP_VERSION}] [Application]:`, '@@');
+        const debug = new Debug(false, `[${APP_VERSION}] [Application]:`, '@');
     </script>
 
     <style>
@@ -27,10 +27,6 @@
             width: fit-content;
             width: -moz-fit-content;
             margin: 1rem;
-            border: solid 1px greenyellow;
-            border-radius: 10px;
-        }
-        .highlight {
             border: solid 1px greenyellow;
             border-radius: 10px;
         }
@@ -79,7 +75,7 @@
     <div class="media-container">
         <h3>Video</h3>
         <video controls preload="none" crossorigin="anonymous" src="media/video.mp4"></video>
-        <span class="attribution">Video © Blender Foundation | <a href="www.blender.org">www.blender.org</a></span>
+        <span class="attribution">Video © Blender Foundation | <a href="https://www.blender.org/">www.blender.org</a></span>
     </div>
 
     <div id="buttons"></div>

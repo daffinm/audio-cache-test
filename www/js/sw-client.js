@@ -20,7 +20,6 @@ const SwClient = {
         debug.log('Adding controllerchange listener.');
         let refreshing = false;
         navigator.serviceWorker.oncontrollerchange = function(controllerchangeevent) {
-            // navigator.serviceWorker.addEventListener('controllerchange', function() {
             if (refreshing) return;
             debug.warn('controllerchange >> refreshing page!');
             refreshing = true;
@@ -61,22 +60,25 @@ const SwClient = {
             let data = {message: message};
             serviceWorker.postMessage(data);
         }
-        function handleRegistration(reg, waitingServiceWorkerFound) {
+
+        function handleRegistration(reg, callbackWaitingServiceWorkerFound) {
             assert.isDefined(reg, 'reg');
             SwClient._logRegistration(reg, 'handleRegistration()');
+
             function awaitStateChange() {
                 reg.installing.addEventListener('statechange', function() {
-                    SwClient._logRegistration(reg, `awaitStateChange()`);
-                    if (this.state === 'installed') waitingServiceWorkerFound(reg);
+                    SwClient._logRegistration(reg, `statechange: [${this.state}]`);
+                    if (this.state === 'installed') callbackWaitingServiceWorkerFound(reg);
                 });
             }
             // =========================================================================================================
             // This is the crux, right here.
             // =========================================================================================================
-            if (reg.waiting) return waitingServiceWorkerFound(reg);
+            if (reg.waiting) return callbackWaitingServiceWorkerFound(reg);
             if (reg.installing) awaitStateChange();
             reg.addEventListener('updatefound', awaitStateChange);
         }
+
         function doRegister(scriptURL) {
             return new Promise(function (resolve, reject) {
                 navigator.serviceWorker.register(scriptURL)
