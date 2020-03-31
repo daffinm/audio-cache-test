@@ -6,14 +6,15 @@
     <meta id="meta-viewport" name="viewport" content="user-scalable=yes, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">
     <script type="text/javascript" src="js/jquery-3.4.1.min.js"></script>
     <script src="js/debug.js"></script>
-    <script defer src="js/sw-client.js"></script>
     <script>
         const BUILD_MMR = '1.0.0';
         const BUILD_DATE = '20200331';
-        const BUILD_NUMBER = '2';
+        const BUILD_NUMBER = '105';
         const APP_VERSION = `${BUILD_MMR}.${BUILD_DATE}#${BUILD_NUMBER}`;
         const debug = new Debug(false, `[${APP_VERSION}] [Application]:`, '@');
     </script>
+    <!--<script src="js/sw-client.js"></script>-->
+    <script type="module" src="js/sw-client-v2.js"></script>
 
     <style>
         body {
@@ -60,6 +61,46 @@
         }
         video {
             max-height: 150px;
+        }
+        span.warning {
+            -webkit-animation: blink .75s linear infinite;
+            -moz-animation: blink .75s linear infinite;
+            -ms-animation: blink .75s linear infinite;
+            -o-animation: blink .75s linear infinite;
+            animation: blink .75s linear infinite;
+            color: red;
+            font-size: larger;
+            text-transform: uppercase;
+        }
+        @-webkit-keyframes blink {
+            0% { opacity: 1; }
+            50% { opacity: 1; }
+            50.01% { opacity: 0; }
+            100% { opacity: 0; }
+        }
+        @-moz-keyframes blink {
+            0% { opacity: 1; }
+            50% { opacity: 1; }
+            50.01% { opacity: 0; }
+            100% { opacity: 0; }
+        }
+        @-ms-keyframes blink {
+            0% { opacity: 1; }
+            50% { opacity: 1; }
+            50.01% { opacity: 0; }
+            100% { opacity: 0; }
+        }
+        @-o-keyframes blink {
+            0% { opacity: 1; }
+            50% { opacity: 1; }
+            50.01% { opacity: 0; }
+            100% { opacity: 0; }
+        }
+        @keyframes blink {
+            0% { opacity: 1; }
+            50% { opacity: 1; }
+            50.01% { opacity: 0; }
+            100% { opacity: 0; }
         }
     </style>
 </head>

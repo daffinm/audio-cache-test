@@ -249,7 +249,7 @@ const SwClient = {
     },
 };
 
-window.addEventListener('load', function() {
-    debug.warn('Registering Service Worker now, here.');
+// window.addEventListener('load', function() {
+//     debug.warn('Registering Service Worker now, here.');
     SwClient.registerServiceWorker();
-});
+// });
