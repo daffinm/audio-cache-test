@@ -4,7 +4,7 @@
   "displayName": "Audio Cache Test",
   "main": "index.html",
   "scripts": {
-    "start": "http-server ./www-deploy -c3600 -p8081"
+    "start": "http-server ./www-deploy -c-1 -p8081"
   },
   "keywords": [
     "pwa",

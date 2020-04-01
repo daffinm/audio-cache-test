@@ -6,14 +6,18 @@
     <meta id="meta-viewport" name="viewport" content="user-scalable=yes, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">
     <script type="text/javascript" src="js/jquery-3.4.1.min.js"></script>
     <script src="js/debug.js"></script>
-    <script defer src="js/sw-client.js"></script>
     <script>
         const BUILD_MMR = '1.0.0';
-        const BUILD_DATE = '20200328';
-        const BUILD_NUMBER = '19';
+        const BUILD_DATE = '20200401';
+        const BUILD_NUMBER = '28';
         const APP_VERSION = `${BUILD_MMR}.${BUILD_DATE}#${BUILD_NUMBER}`;
-        setDebug(true, `[${APP_VERSION}] [Application]:`, '@@');
+        const DEBUG_LOGGING = true;
+        // The logger
+        const debug = new Debug(DEBUG_LOGGING, `[${APP_VERSION}] [Application]:`, '@');
+        debug.heading('App is starting up...');
     </script>
+    <!--<script src="js/sw-client.js"></script>-->
+    <script type="module" src="js/sw-client-v2.js"></script>
 
     <style>
         body {
@@ -27,10 +31,6 @@
             width: fit-content;
             width: -moz-fit-content;
             margin: 1rem;
-            border: solid 1px greenyellow;
-            border-radius: 10px;
-        }
-        .highlight {
             border: solid 1px greenyellow;
             border-radius: 10px;
         }
@@ -62,6 +62,55 @@
             display: block;
             margin-top: 5px;
         }
+        video {
+            max-height: 150px;
+        }
+        .highlight {
+            border: solid 1px greenyellow;
+        }
+        audio.highlight {
+            border-radius: 10px;
+        }
+        span.warning {
+            -webkit-animation: blink .75s linear infinite;
+            -moz-animation: blink .75s linear infinite;
+            -ms-animation: blink .75s linear infinite;
+            -o-animation: blink .75s linear infinite;
+            animation: blink .75s linear infinite;
+            color: red;
+            font-size: larger;
+            text-transform: uppercase;
+        }
+        @-webkit-keyframes blink {
+            0% { opacity: 1; }
+            50% { opacity: 1; }
+            50.01% { opacity: 0; }
+            100% { opacity: 0; }
+        }
+        @-moz-keyframes blink {
+            0% { opacity: 1; }
+            50% { opacity: 1; }
+            50.01% { opacity: 0; }
+            100% { opacity: 0; }
+        }
+        @-ms-keyframes blink {
+            0% { opacity: 1; }
+            50% { opacity: 1; }
+            50.01% { opacity: 0; }
+            100% { opacity: 0; }
+        }
+        @-o-keyframes blink {
+            0% { opacity: 1; }
+            50% { opacity: 1; }
+            50.01% { opacity: 0; }
+            100% { opacity: 0; }
+        }
+        @keyframes blink {
+            0% { opacity: 1; }
+            50% { opacity: 1; }
+            50.01% { opacity: 0; }
+            100% { opacity: 0; }
+        }
     </style>
 </head>
 <body>
@@ -76,7 +125,7 @@
     <div class="media-container">
         <h3>Video</h3>
         <video controls preload="none" crossorigin="anonymous" src="media/video.mp4"></video>
-        <span class="attribution">Video © Blender Foundation | <a href="www.blender.org">www.blender.org</a></span>
+        <span class="attribution">Video © Blender Foundation | <a href="https://www.blender.org/">www.blender.org</a></span>
     </div>
 
     <div id="buttons"></div>
@@ -89,6 +138,16 @@
     <script type="text/javascript">
         $(document).ready(function () {
             let $media = $('audio,video');
+
+            // Need to do this in order to test on Chrome. Chrome caches media even when you tell it no to in Dev Tools.
+            // This means you can refresh the page, get a new time stamp, and force Chrome to dump what it had and request it again.
+            let tstamp = new Date().getTime();
+            $media.each(function () {
+                let src = $(this).attr('src');
+                src = `${src}?time=${tstamp}`;
+                $(this).attr('src', src);
+            });
+
             $media.on('play', function () {
                 $('audio,video').not(this).each(function(){
                     this.pause(); // Stop playing

@@ -4,8 +4,6 @@
 # ----------------------------------------------------------------------------------------------------------------------
 SOURCE_DIR="www/"
 DEPLOY_DIR="www-deploy/"
-WORKBOX_CONFIG=workbox-config-app.js
-WORKBOX_CONFIG_MEDIA=workbox-config-media.js
 BUILD_INFO_MMR="1.0.0"
 BUILD_INFO_FILE_APP="${SOURCE_DIR}index.html"
 BUILD_INFO_FILE_SW="${SOURCE_DIR}sw.js"
@@ -50,10 +48,11 @@ rsync -v -a $SOURCE_DIR $DEPLOY_DIR --delete
 # ----------------------------------------------------------------------------------------------------------------------
 # See https://developers.google.com/web/tools/workbox/guides/precache-files/cli
 #workbox wizard --injectManifest
-printf "\n::::: Injecting Workbox pre-cache:\n\n"
-workbox injectManifest $WORKBOX_CONFIG
-# Leverage injectManifest to get revision info for our media files so we can update the cache intelligently.
-workbox injectManifest $WORKBOX_CONFIG_MEDIA
+
+printf "\n::::: Injecting precache manifest:\n"
+workbox injectManifest workbox-config-precache.js
+printf "\n::::: Injecting runtime manifest:\n"
+workbox injectManifest workbox-config-runtime.js
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Deploy to Firebase?
@@ -66,5 +65,5 @@ if [ "$1" == "deploy" ]; then
     firebase deploy
   fi
 fi
-
+printf "\n::::: BUILD DONE!\n"
 cat ./app-version.txt
