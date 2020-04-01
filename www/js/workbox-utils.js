@@ -17,10 +17,8 @@ function WorkboxCacheFileInfo(fileInfoArray) {
         assert.isDefined(matches, 'matches');
         return matches[1];
     }
-
     const FILE_INFO_MAP = initFileInfoMap(fileInfoArray);
     const WORKBOX_REVISION_PARAM = '__WB_REVISION__';
-
     this.getRevisionFor = function (url) {
         let key = getRelativeUrlFrom(url);
         let revision = FILE_INFO_MAP[key];
@@ -84,7 +82,7 @@ function WorkboxCacheBeforeCacheOnly(serviceWorkerExecutionContext, cacheName, c
                 });
             })
                 .catch(function (error) {
-                    debug.error(`Problem deleting orphan(s) from cache '${CACHE_NAME}':\n${error}`);
+                    debug.error(`Problem deleting orphan(s) from cache [${CACHE_NAME}']:\n${error}`);
                 })
         );
     }
@@ -102,18 +100,22 @@ function WorkboxCacheBeforeCacheOnly(serviceWorkerExecutionContext, cacheName, c
     // Add the file to the cache if it has not already been added, or update the cache if a newer file exists
     // in the file revision data provided - wbCacheFileInfo
     async function updateCacheAsNecessary(url) {
+        function log(resultMessage) {
+            let message = `updateCacheAsNecessary: ${CACHE_NAME}\n - Request: ${url}\n - Result: ${resultMessage}`;
+            debug.log(message);
+        }
         url = stripParametersFrom(url);
         if (myCache === null) {
             myCache = await caches.open(CACHE_NAME);
-            assert.isTrue(myCache, `Cannot open cache '${CACHE_NAME}'`);
+            assert.isTrue(myCache, `Cannot open cache ${CACHE_NAME}`);
         }
         let alreadyCached = (await myCache.match(url, CACHE_MATCH_OPTIONS));
         if (alreadyCached) {
-            debug.log(`Response is already cached in [${CACHE_NAME}]:\n${url}`);
+            log(`Response is already cached!`);
             let cachedRevision = CACHE_FILE_INFO.getRevisionParameterFrom(alreadyCached.url);
             // Handle case where previously cached resource did not use revision param.
             if (!cachedRevision) {
-                debug.log(`NO VERSION INFO! Re-caching response in [${CACHE_NAME}]:\n${url}`);
+                log(`NO VERSION INFO! Re-caching response...`);
                 await myCache.delete(url, CACHE_MATCH_OPTIONS);
                 let urlToCache = CACHE_FILE_INFO.addRevisionParameterTo(url);
                 await myCache.add(urlToCache);
@@ -121,7 +123,7 @@ function WorkboxCacheBeforeCacheOnly(serviceWorkerExecutionContext, cacheName, c
                 let latestRevision = CACHE_FILE_INFO.getRevisionFor(url);
                 assert.isDefined(latestRevision, 'latestRevision', `Bug: Cannot find latest revision info for file: ${url}`);
                 if (cachedRevision !== latestRevision) {
-                    debug.log(`NEW VERSION DETECTED!\n - Cached revision: ${cachedRevision}\n - Latest revision: ${latestRevision}\nRe-caching response in [${CACHE_NAME}]:${url}`);
+                    log(`NEW VERSION DETECTED!\n -- Cached revision: ${cachedRevision}\n -- Latest revision: ${latestRevision}\n -- Re-caching response...`);
                     await myCache.delete(url, CACHE_MATCH_OPTIONS);
                     let urlToCache = CACHE_FILE_INFO.addRevisionParameterTo(url);
                     await myCache.add(urlToCache);
@@ -129,7 +131,7 @@ function WorkboxCacheBeforeCacheOnly(serviceWorkerExecutionContext, cacheName, c
             }
 
         } else {
-            debug.log(`NOT CACHED! Caching response fully in [${CACHE_NAME}]:\n${url}`);
+            log(`NOT CACHED! Caching response...`);
             let urlToCache = CACHE_FILE_INFO.addRevisionParameterTo(url);
             await myCache.add(urlToCache);
         }
@@ -146,7 +148,6 @@ function WorkboxCacheBeforeCacheOnly(serviceWorkerExecutionContext, cacheName, c
     this.handle = async function ({event, request}) {
         // debugger;
         await updateCacheAsNecessary(request.url);
-        debug.log(`Responding to request from cache [${CACHE_NAME}]:\n${request.url}`);
         return myCacheOnlyRouteHandler.handle({event, request});
     };
 }

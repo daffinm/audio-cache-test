@@ -8,10 +8,13 @@
     <script src="js/debug.js"></script>
     <script>
         const BUILD_MMR = '1.0.0';
-        const BUILD_DATE = '20200331';
-        const BUILD_NUMBER = '144';
+        const BUILD_DATE = '20200401';
+        const BUILD_NUMBER = '28';
         const APP_VERSION = `${BUILD_MMR}.${BUILD_DATE}#${BUILD_NUMBER}`;
-        const debug = new Debug(false, `[${APP_VERSION}] [Application]:`, '@');
+        const DEBUG_LOGGING = true;
+        // The logger
+        const debug = new Debug(DEBUG_LOGGING, `[${APP_VERSION}] [Application]:`, '@');
+        debug.heading('App is starting up...');
     </script>
     <!--<script src="js/sw-client.js"></script>-->
     <script type="module" src="js/sw-client-v2.js"></script>
