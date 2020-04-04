@@ -1,3 +1,4 @@
+importScripts('https://cdn.jsdelivr.net/gh/daffinm/pwa-utils@latest/js/assert.js');
 
 function WorkboxCacheFileInfo(fileInfoArray) {
     function initFileInfoMap(fileInfoArray) {

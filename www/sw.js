@@ -4,8 +4,8 @@
 // Update this manually.
 const BUILD_MMR = '1.0.0';
 // These are updated automatically by the build.
-const BUILD_DATE = '20200401';
-const BUILD_NUMBER = '28';
+const BUILD_DATE = '20200404';
+const BUILD_NUMBER = '24';
 const APP_VERSION = `${BUILD_MMR}.${BUILD_DATE}#${BUILD_NUMBER}`;
 // Debug logging - update manually
 const DEBUG_LOGGING = true;
@@ -19,8 +19,8 @@ const APP_CACHE_SUFFIX = `v${BUILD_MMR}`;
 // =====================================================================================================================
 // Begin script
 // =====================================================================================================================
-importScripts('/js/debug.js');
-const debug = new Debug(DEBUG_LOGGING, `[${APP_VERSION}] [Service Worker]:`, 'Ş');
+importScripts('https://cdn.jsdelivr.net/gh/daffinm/pwa-utils@latest/js/debug-console.js');
+const debug = new DebugConsole(DEBUG_LOGGING, `${APP_VERSION}`, 'indianred');
 debug.heading(`SERVICE WORKER STARTING`);
 
 importScripts(`https://storage.googleapis.com/workbox-cdn/releases/${WORKBOX_VERSION}/workbox-sw.js`);
@@ -76,6 +76,16 @@ self.addEventListener('activate', function(event) {
 // ---------------------------------------------------------------------------------------------------------------------
 workbox.precaching.cleanupOutdatedCaches();
 workbox.precaching.precacheAndRoute(self.__PRECACHE_MANIFEST);
+// ---------------------------------------------------------------------------------------------------------------------
+// External resources
+// ---------------------------------------------------------------------------------------------------------------------
+workbox.routing.registerRoute(
+    new RegExp("^https://cdn.jsdelivr.net/gh/daffinm/.*$"),
+    new workbox.strategies.NetworkFirst({
+        cacheName: APP_CACHE_PREFIX + '-runtime-external-' + APP_CACHE_SUFFIX,
+    })
+);
+
 // ---------------------------------------------------------------------------------------------------------------------
 // Runtime caching (including media): 'vorsprung durch technik'
 // ---------------------------------------------------------------------------------------------------------------------

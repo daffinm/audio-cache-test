@@ -7,6 +7,7 @@ module.exports = {
     "index.html",
     "manifest.json",
     "favicon.ico",
+    // "js/workbox-utils.js",
   ],
   swSrc: "www-deploy/sw.js",
   swDest: "www-deploy/sw.js",

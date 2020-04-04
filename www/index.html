@@ -4,20 +4,10 @@
     <meta charset="UTF-8">
     <title>Workbox Media Cache Test</title>
     <meta id="meta-viewport" name="viewport" content="user-scalable=yes, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">
-    <script type="text/javascript" src="js/jquery-3.4.1.min.js"></script>
-    <script src="js/debug.js"></script>
-    <script>
-        const BUILD_MMR = '1.0.0';
-        const BUILD_DATE = '20200401';
-        const BUILD_NUMBER = '28';
-        const APP_VERSION = `${BUILD_MMR}.${BUILD_DATE}#${BUILD_NUMBER}`;
-        const DEBUG_LOGGING = true;
-        // The logger
-        const debug = new Debug(DEBUG_LOGGING, `[${APP_VERSION}] [Application]:`, '@');
-        debug.heading('App is starting up...');
-    </script>
-    <!--<script src="js/sw-client.js"></script>-->
-    <script type="module" src="js/sw-client-v2.js"></script>
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/gh/daffinm/pwa-utils@0.0.1.2/js/assert.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/gh/daffinm/pwa-utils@0.0.1.2/js/debug-console.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/gh/daffinm/pwa-utils@0.0.1.2/js/sw-client.js"></script>
 
     <style>
         body {
@@ -71,15 +61,13 @@
         audio.highlight {
             border-radius: 10px;
         }
-        span.warning {
+        span.error {
             -webkit-animation: blink .75s linear infinite;
             -moz-animation: blink .75s linear infinite;
             -ms-animation: blink .75s linear infinite;
             -o-animation: blink .75s linear infinite;
             animation: blink .75s linear infinite;
             color: red;
-            font-size: larger;
-            text-transform: uppercase;
         }
         @-webkit-keyframes blink {
             0% { opacity: 1; }
@@ -112,6 +100,18 @@
             100% { opacity: 0; }
         }
     </style>
+
+    <script>
+        const BUILD_MMR = '1.0.0';
+        const BUILD_DATE = '20200404';
+        const BUILD_NUMBER = '24';
+        const APP_VERSION = `${BUILD_MMR}.${BUILD_DATE}#${BUILD_NUMBER}`;
+        const DEBUG_LOGGING = true;
+        // The logger
+        const debug = new DebugConsole(DEBUG_LOGGING, `${APP_VERSION}`, 'cornflowerblue');
+        debug.heading('App is starting up...');
+    </script>
+
 </head>
 <body>
     <h2>Media Cache Test <span class="version"></span></h2>
@@ -136,32 +136,63 @@
 
 
     <script type="text/javascript">
-        $(document).ready(function () {
-            let $media = $('audio,video');
-
-            // Need to do this in order to test on Chrome. Chrome caches media even when you tell it no to in Dev Tools.
-            // This means you can refresh the page, get a new time stamp, and force Chrome to dump what it had and request it again.
-            let tstamp = new Date().getTime();
-            $media.each(function () {
-                let src = $(this).attr('src');
-                src = `${src}?time=${tstamp}`;
-                $(this).attr('src', src);
-            });
-
-            $media.on('play', function () {
-                $('audio,video').not(this).each(function(){
-                    this.pause(); // Stop playing
-                    this.currentTime = 0; // Reset time
-                });
-            });
-            $media.on('error', function (e) {
-                debug.error(`Error loading ${this.src}`, e);
-            });
-            if (!/Chrome/.test(navigator.userAgent)) {
-                $media.addClass('highlight');
-            }
-            $('.version').text(`v${APP_VERSION}`);
+        let $media = $('audio,video');
+        // Need to do this in order to test on Chrome. Chrome caches media even when you tell it no to in Dev Tools.
+        // This means you can refresh the page, get a new time stamp, and force Chrome to dump what it had and request it again.
+        let tstamp = new Date().getTime();
+        $media.each(function () {
+            let src = $(this).attr('src');
+            src = `${src}?time=${tstamp}`;
+            $(this).attr('src', src);
         });
+
+        $media.on('play', function () {
+            $('audio,video').not(this).each(function(){
+                this.pause(); // Stop playing
+                this.currentTime = 0; // Reset time
+            });
+        });
+        $media.on('error', function (e) {
+            debug.error(`Error loading ${this.src}`, e);
+        });
+        if (!/Chrome/.test(navigator.userAgent)) {
+            $media.addClass('highlight');
+        }
+        $('.version').text(`v${APP_VERSION}`);
     </script>
+    <script>
+        function sendMessageToUser(message, error) {
+            let $messageBoard = $('#message-board');
+            message = (error ? `<span class="error">${message}</span>` : message);
+            $messageBoard.html(`<p style="display: none;">${message}</p>`);
+            let $message = $('#message-board p');
+            $message.fadeIn();
+            setTimeout(function () {
+                $message.fadeOut();
+            }, 5000);
+        }
+
+        const simpleUI = new SimpleUI(debug);
+        simpleUI.noUpdateFound = function () {
+            sendMessageToUser(`No update found. You are already on the latest version.`);
+        };
+        simpleUI.updateError = function (err) {
+            sendMessageToUser('Cannot check for updates. Are you offline?', true);
+        };
+        simpleUI.reload = function () {
+            sendMessageToUser('Reloading...', true);
+            setTimeout(() => self.location.reload(), 2000);
+        };
+        const swc = new ServiceWorkerClient('/sw.js', debug, simpleUI);
+        swc.register();
+        const $updateButton = $(`<button id="update">Check for Updates...</button>`);
+        $updateButton.on('click', function () {
+            sendMessageToUser(`Checking for updates... If I find some I'll let you know :)`);
+            swc.update(true);
+        });
+        $('#buttons').append($updateButton);
+
+    </script>
+
 </body>
 </html>
